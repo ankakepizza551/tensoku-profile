@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>非想天則 プロフィールカードメーカー (比率維持版)</title>
+<style>
+  :root {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --accent-color: #00ff99;
+    --border-color: #444;
+  }
+
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #121212;
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 { color: var(--accent-color); text-shadow: 0 0 10px var(--accent-color); font-size: 1.5rem; }
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 1200px;
+  }
+
+  #profile-form {
+    background-color: var(--bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .form-group { margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+  label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--accent-color); font-size: 0.9em; }
+  
+  input[type="text"], select, textarea {
+    width: 100%;
+    padding: 8px;
+    background-color: #000;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    box-sizing: border-box;
+  }
+
+  .inline-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
+  .inline-group label { display: flex; align-items: center; gap: 5px; color: #fff; font-weight: normal; font-size: 0.85em; }
+
+  .sub-char-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    max-height: 120px;
+    overflow-y: auto;
+    background: #000;
+    padding: 10px;
+    border-radius: 4px;
+  }
+
+  button {
+    width: 100%;
+    padding: 15px;
+    background-color: #000;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  button:hover { background-color: var(--accent-color); color: #000; box-shadow: 0 0 15px var(--accent-color); }
+
+  #output-area { text-align: center; width: 600px; }
+  canvas { display: none; }
+  #final-image { max-width: 100%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; }
+  .download-note { margin-top: 10px; color: #888; font-size: 0.8em; display: none; }
+
+  #color-selection-container {
+    background: #222;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+  <h1>HISOUTENSOKU PROFILE GENERATOR</h1>
+
+  <div class="container">
+    <form id="profile-form">
+      <div class="form-group">
+        <label>プレイヤー名</label>
+        <input type="text" id="name" placeholder="Name" required>
+      </div>
+
+      <div class="form-group">
+        <label>メインキャラ</label>
+        <select id="main-char" onchange="updateColorOptions()"></select>
+        <div id="color-selection-container">
+          <label>カラー選択</label>
+          <select id="color-select"></select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>サブキャラ（複数可）</label>
+        <div id="sub-chars" class="sub-char-list"></div>
+      </div>
+
+      <div class="form-group">
+        <label>段位 / レート</label>
+        <input type="text" id="rank" placeholder="例: Lunatic / 1650">
+      </div>
+
+      <div class="form-group">
+        <label>プレイスタイル</label>
+        <div class="inline-group">
+          <label><input type="radio" name="style" value="ガチ勢" checked> ガチ勢</label>
+          <label><input type="radio" name="style" value="エンジョイ"> エンジョイ</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>活動時間帯</label>
+        <input type="text" id="time" placeholder="例: 平日22時〜">
+      </div>
+
+      <div class="form-group">
+        <label>デバイス</label>
+        <input type="text" id="device" placeholder="例: リアルアーケードPro">
+      </div>
+
+      <div class="form-group">
+        <label>外部ツール</label>
+        <div class="inline-group">
+          <label><input type="checkbox" id="tool-punch"> パンチ</label>
+          <label><input type="checkbox" id="tool-giu"> giu</label>
+          <label><input type="checkbox" id="tool-socro"> ソクロ</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ホスト / クライアント</label>
+        <div class="inline-group">
+          <label><input type="radio" name="side" value="ホスト派" checked> ホスト派</label>
+          <label><input type="radio" name="side" value="クラ派"> クラ派</label>
+          <label><input type="radio" name="side" value="両方可"> 両方可</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>得意キャラ / 苦手キャラ</label>
+        <input type="text" id="matchup" placeholder="得意: 霊夢 / 苦手: 萃香">
+      </div>
+
+      <div class="form-group">
+        <label>天則以外のゲーム</label>
+        <input type="text" id="other-games" placeholder="例: スト6">
+      </div>
+
+      <button type="button" onclick="generateCard()">カードを生成する</button>
+    </form>
+
+    <div id="output-area">
+      <canvas id="card-canvas" width="600" height="500"></canvas>
+      <img id="final-image" alt="Profile Card">
+      <p class="download-note" id="download-note">画像を右クリックまたは長押しで保存してね</p>
+    </div>
+  </div>
+
+<script>
+const commonColors = [
+  { id: "1", label: "1P" }, { id: "2", label: "2P" },
+  { id: "3", label: "3P" }, { id: "4", label: "4P" },
+  { id: "5", label: "5P" }, { id: "6", label: "6P" },
+  { id: "7", label: "7P" }, { id: "8", label: "8P" }
+];
+
+const charImageData = {
+  "博麗 霊夢": { folder: "reimu", baseName: "reimu" },
+  "霧雨 魔理沙": { folder: "marisa", baseName: "marisa" },
+  "東風谷 早苗": { folder: "sanae", baseName: "sanae" },
+  "チルノ": { folder: "cirno", baseName: "cirno" },
+  "紅 美鈴": { folder: "meirin", baseName: "meirin" },
+  "十六夜 咲夜": { folder: "sakuya", baseName: "sakuya" },
+  "アリス": { folder: "alice", baseName: "alice" },
+  "伊吹 萃香": { folder: "suika", baseName: "suika" },
+  "鈴仙": { folder: "reisen", baseName: "reisen" },
+  "射命丸 文": { folder: "aya", baseName: "aya" },
+  "小野塚 小町": { folder: "komachi", baseName: "komachi" },
+  "永江 衣玖": { folder: "iku", baseName: "iku" },
+  "比那名居 天子": { folder: "tenshi", baseName: "tenshi" },
+  "パチュリー": { folder: "patche", baseName: "patchouli" },
+  "西行寺 幽々子": { folder: "yuyuko", baseName: "yuyuko" },
+  "八雲 紫": { folder: "yukari", baseName: "yukari" },
+  "洩矢 諏訪子": { folder: "suwako", baseName: "suwako" },
+  "霊烏路 空": { folder: "utsuho", baseName: "utsuho" },
+  "魂魄 妖夢": { folder: "youmu", baseName: "youmu" },
+  "レミリア": { folder: "remilia", baseName: "remilia" }
+};
+
+window.onload = function() {
+  const mainSelect = document.getElementById('main-char');
+  const subDiv = document.getElementById('sub-chars');
+  Object.keys(charImageData).forEach(char => {
+    const opt = document.createElement('option');
+    opt.value = char; opt.textContent = char;
+    mainSelect.appendChild(opt);
+    const lbl = document.createElement('label');
+    lbl.innerHTML = `<input type="checkbox" name="sub-char" value="${char}"> ${char}`;
+    subDiv.appendChild(lbl);
+  });
+  updateColorOptions();
+};
+
+function updateColorOptions() {
+  const mainChar = document.getElementById('main-char').value;
+  const container = document.getElementById('color-selection-container');
+  const colorSelect = document.getElementById('color-select');
+  if (charImageData[mainChar]) {
+    container.style.display = 'block';
+    colorSelect.innerHTML = commonColors.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+  } else { container.style.display = 'none'; }
+}
+
+function generateCard() {
+  const canvas = document.getElementById('card-canvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width; const h = canvas.height;
+  const accent = '#00ff99';
+
+  const name = document.getElementById('name').value || 'Nanashi';
+  const mainChar = document.getElementById('main-char').value;
+  const colorId = document.getElementById('color-select').value;
+  const subChars = Array.from(document.querySelectorAll('input[name="sub-char"]:checked')).map(el => el.value).join(', ') || 'なし';
+  const rank = document.getElementById('rank').value || '-';
+  const style = document.querySelector('input[name="style"]:checked').value;
+  const side = document.querySelector('input[name="side"]:checked').value;
+  const time = document.getElementById('time').value || '-';
+  const device = document.getElementById('device').value || '-';
+  const tools = [
+    document.getElementById('tool-punch').checked ? 'パンチ' : null,
+    document.getElementById('tool-giu').checked ? 'giu' : null,
+    document.getElementById('tool-socro').checked ? 'ソクロ' : null
+  ].filter(t => t).join(' / ') || 'なし';
+  const matchup = document.getElementById('matchup').value || '-';
+  const other = document.getElementById('other-games').value || '-';
+
+  // 背景描画
+  ctx.fillStyle = '#111'; ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = accent; ctx.lineWidth = 3; ctx.strokeRect(10, 10, w-20, h-20);
+  ctx.fillStyle = accent; ctx.font = 'bold 24px sans-serif'; ctx.fillText('HISOUTENSOKU PLAYER PROFILE', 30, 50);
+
+  let currentY = 90;
+  function drawItem(label, value, isLong = false) {
+    ctx.fillStyle = accent; ctx.font = 'bold 14px sans-serif'; ctx.fillText(label, 30, currentY);
+    ctx.fillStyle = '#fff'; ctx.font = '18px sans-serif';
+    if(isLong) { ctx.font = '15px sans-serif'; ctx.fillText(value, 30, currentY + 25, 380); currentY += 60; }
+    else { ctx.fillText(value, 180, currentY); currentY += 40; }
+  }
+
+  drawItem('PLAYER NAME', name);
+  drawItem('MAIN CHARACTER', mainChar);
+  drawItem('SUB CHARACTERS', subChars, true);
+  drawItem('RANK / RATE', rank);
+  drawItem('STYLE / SIDE', `${style} / ${side}`);
+  drawItem('ACTIVITY TIME', time);
+  drawItem('DEVICE', device);
+  drawItem('EXTERNAL TOOLS', tools);
+  drawItem('MATCHUP', matchup);
+  drawItem('OTHER GAMES', other);
+
+  if (charImageData[mainChar]) {
+    const img = new Image();
+    const data = charImageData[mainChar];
+    img.src = `./image/${data.folder}/${data.baseName}-${colorId}p.jpg`;
+
+    img.onload = function() {
+      ctx.imageSmoothingEnabled = false; 
+
+      const frameW = 160;
+      const frameH = 200;
+      const frameX = 410;
+      const frameY = 80;
+
+      let drawW = img.width;
+      let drawH = img.height;
+      const ratio = Math.min(frameW / drawW, frameH / drawH);
+      drawW *= ratio;
+      drawH *= ratio;
+
+      const offsetX = frameX + (frameW - drawW) / 2;
+      const offsetY = frameY + (frameH - drawH) / 2;
+
+      ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+      finalize();
+    };
+    img.onerror = () => { finalize(); };
+  } else { finalize(); }
+
+  function finalize() {
+    const finalImg = document.getElementById('final-image');
+    finalImg.src = canvas.toDataURL('image/png');
+    finalImg.style.display = 'block';
+    document.getElementById('download-note').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
