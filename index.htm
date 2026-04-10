@@ -1,85 +1,300 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>非想天則 プロフィールカードメーカー PRO</title>
 <style>
-  /* ...これまでのスタイルを維持しつつ、以下を調整... */
-  
-  .form-group { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
-
-  /* 1項目1段にするためのスタイル */
-  .full-width-input {
-    width: 100%;
-    margin-bottom: 10px;
+  :root {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --accent-color: #00ff99;
+    --border-color: #444;
+    --card-width: 600px;
   }
 
-  /* ラジオボタンやチェックボックスもゆったり配置 */
-  .selection-row {
-    display: flex;
-    flex-direction: column; /* 縦に並べる */
-    gap: 12px;
-    margin-top: 10px;
+  body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+    background-color: #121212;
+    color: var(--text-color);
+    margin: 0; padding: 10px;
+    display: flex; flex-direction: column; align-items: center;
   }
+
+  h1 { color: var(--accent-color); text-shadow: 0 0 10px var(--accent-color); font-size: 1.2rem; margin-bottom: 20px; }
+
+  .container { width: 100%; max-width: var(--card-width); display: flex; flex-direction: column; gap: 20px; }
+
+  #profile-form {
+    background-color: var(--bg-color);
+    padding: 20px; border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+  }
+
+  .form-group { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+  label { display: block; margin-bottom: 10px; font-weight: bold; color: var(--accent-color); font-size: 0.9em; }
   
-  .selection-row label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #222;
-    padding: 12px;
-    border-radius: 6px;
-    color: #fff;
-    font-weight: normal;
+  input[type="text"], textarea {
+    width: 100%; padding: 12px; background: #000; border: 1px solid var(--border-color);
+    border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box;
   }
+
+  /* キャラアイコン選択 */
+  .char-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px;
+  }
+  .char-icon-item {
+    cursor: pointer; border: 2px solid #333; border-radius: 4px; aspect-ratio: 1/1;
+    background: #222; display: flex; align-items: center; justify-content: center;
+    transition: 0.2s; color: #888; font-size: 10px; text-align: center; line-height: 1.2;
+  }
+  .char-icon-item.selected { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); color: var(--accent-color); background: #000; }
+
+  /* カラー選択 */
+  .color-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+  .color-btn {
+    padding: 10px 14px; background: #333; border: 1px solid #555; color: #fff;
+    cursor: pointer; border-radius: 4px; font-size: 12px;
+  }
+  .color-btn.selected { background: var(--accent-color); color: #000; font-weight: bold; border-color: var(--accent-color); }
+
+  /* 縦並びの選択肢（1段ずつ） */
+  .selection-stack { display: flex; flex-direction: column; gap: 10px; }
+  .selection-stack label {
+    display: flex; align-items: center; gap: 12px; background: #262626;
+    padding: 12px; border-radius: 8px; color: #fff; font-weight: normal; margin-bottom: 0;
+  }
+
+  button#generate-btn {
+    width: 100%; padding: 18px; background: #000; color: var(--accent-color);
+    border: 2px solid var(--accent-color); border-radius: 8px;
+    font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+  }
+  button#generate-btn:hover { background: var(--accent-color); color: #000; }
+
+  #output-area { width: 100%; margin-top: 20px; text-align: center; }
+  #card-canvas { display: none; }
+  #final-image { width: 100%; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
 </style>
+</head>
+<body>
 
-<form id="profile-form">
-  <div class="form-group">
-    <label>プレイヤー名</label>
-    <input type="text" id="name" placeholder="Name" class="full-width-input">
-  </div>
+  <h1>HISOUTENSOKU PROFILE GENERATOR</h1>
 
-  <div class="form-group">
-    <label>段位 / レート</label>
-    <input type="text" id="rank" placeholder="例: Lunatic / 1650" class="full-width-input">
-  </div>
+  <div class="container">
+    <form id="profile-form">
+      <div class="form-group">
+        <label>プレイヤー名</label>
+        <input type="text" id="name" placeholder="Name">
+      </div>
 
-  <div class="form-group">
-    <label>メインキャラ選択</label>
-    <div id="char-selector" class="char-grid"></div>
-    <label style="margin-top: 15px;">カラー選択</label>
-    <div id="color-selector" class="color-chips"></div>
-  </div>
+      <div class="form-group">
+        <label>段位 / レート</label>
+        <input type="text" id="rank" placeholder="例: Lunatic / 1650">
+      </div>
 
-  <div class="form-group">
-    <label>活動時間帯</label>
-    <input type="text" id="time" placeholder="例: 平日22時〜" class="full-width-input">
-  </div>
+      <div class="form-group">
+        <label>メインキャラ選択</label>
+        <div id="char-selector" class="char-grid"></div>
+        <label style="margin-top: 15px;">カラー選択 (1P〜8P)</label>
+        <div id="color-selector" class="color-chips"></div>
+      </div>
 
-  <div class="form-group">
-    <label>使用デバイス</label>
-    <input type="text" id="device" placeholder="例: リアルアーケードPro" class="full-width-input">
-  </div>
+      <div class="form-group">
+        <label>サブキャラ</label>
+        <input type="text" id="sub-chars" placeholder="例: 霊夢、魔理沙、萃香など">
+      </div>
 
-  <div class="form-group">
-    <label>ホスト / クラ設定</label>
-    <div class="selection-row">
-      <label><input type="radio" name="side" value="ホスト派" checked> ホスト派</label>
-      <label><input type="radio" name="side" value="クラ派"> クラ派</label>
-      <label><input type="radio" name="side" value="両方可"> 両方可</label>
+      <div class="form-group">
+        <label>プレイスタイル</label>
+        <div class="selection-stack">
+          <label><input type="radio" name="style" value="ガチ勢" checked> ガチ勢</label>
+          <label><input type="radio" name="style" value="エンジョイ"> エンジョイ</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ホスト / クラ設定</label>
+        <div class="selection-stack">
+          <label><input type="radio" name="side" value="ホスト派" checked> ホスト派</label>
+          <label><input type="radio" name="side" value="クラ派"> クラ派</label>
+          <label><input type="radio" name="side" value="両方可"> 両方可</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>活動時間帯</label>
+        <input type="text" id="time" placeholder="例: 平日22時〜">
+      </div>
+
+      <div class="form-group">
+        <label>使用デバイス</label>
+        <input type="text" id="device" placeholder="例: リアルアーケードPro">
+      </div>
+
+      <div class="form-group">
+        <label>外部ツール</label>
+        <div class="selection-stack">
+          <label><input type="checkbox" id="tool-tenco" checked> Tenco</label>
+          <label><input type="checkbox" id="tool-punch"> パンチ</label>
+          <label><input type="checkbox" id="tool-giu"> giu</label>
+          <label><input type="checkbox" id="tool-socro"> ソクロ</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>得意キャラ / 苦手キャラ</label>
+        <input type="text" id="matchup" placeholder="得意: 霊夢 / 苦手: 萃香">
+      </div>
+
+      <div class="form-group">
+        <label>天則以外のゲーム・趣味</label>
+        <input type="text" id="other-games" placeholder="例: スト6、DTMなど">
+      </div>
+
+      <div class="form-group">
+        <label>一言コメント</label>
+        <textarea id="comment" rows="3" placeholder="自由に入力してください"></textarea>
+      </div>
+
+      <button type="button" id="generate-btn" onclick="generateCard()">カードを生成する</button>
+    </form>
+
+    <div id="output-area">
+      <canvas id="card-canvas" width="800" height="550"></canvas>
+      <img id="final-image" alt="Profile Card" style="display:none;">
+      <p style="color: #888; font-size: 0.8em; margin-top: 10px;">画像を長押しして保存してね</p>
     </div>
   </div>
 
-  <div class="form-group">
-    <label>得意キャラ / 苦手キャラ</label>
-    <input type="text" id="matchup" placeholder="得意: 霊夢 / 苦手: 萃香" class="full-width-input">
-  </div>
+<script>
+/* キャラクターデータ定義 */
+const charData = {
+  "博麗 霊夢": "reimu", "霧雨 魔理沙": "marisa", "東風谷 早苗": "sanae", "チルノ": "cirno", 
+  "紅 美鈴": "meirin", "十六夜 咲夜": "sakuya", "アリス": "alice", "伊吹 萃香": "suika", 
+  "鈴仙": "reisen", "射命丸 文": "aya", "小野塚 小町": "komachi", "永江 衣玖": "iku", 
+  "比那名居 天子": "tenshi", "パチュリー": "patche", "西行寺 幽々子": "yuyuko", 
+  "八雲 紫": "yukari", "洩矢 諏訪子": "suwako", "霊烏路 空": "utsuho", 
+  "魂魄 妖夢": "youmu", "レミリア": "remilia"
+};
 
-  <div class="form-group">
-    <label>天則以外のゲーム・趣味</label>
-    <input type="text" id="other-games" placeholder="例: スト6、DTMなど" class="full-width-input">
-  </div>
+let selectedChar = "博麗 霊夢";
+let selectedColor = "1";
 
-  <div class="form-group">
-    <label>サブキャラ・一言コメント</label>
-    <textarea id="comment" rows="3" placeholder="自由に入力してください" class="full-width-input"></textarea>
-  </div>
+/* 初期化処理 */
+window.onload = () => {
+  const selector = document.getElementById('char-selector');
+  Object.keys(charData).forEach(name => {
+    const item = document.createElement('div');
+    item.className = 'char-icon-item';
+    if(name === selectedChar) item.classList.add('selected');
+    item.innerHTML = `<span>${name.replace(' ', '<br>')}</span>`;
+    item.onclick = () => {
+      document.querySelectorAll('.char-icon-item').forEach(el => el.classList.remove('selected'));
+      item.classList.add('selected');
+      selectedChar = name;
+    };
+    selector.appendChild(item);
+  });
+  updateColorSelector();
+};
 
-  <button type="button" id="generate-btn" onclick="generateCard()">カードを生成する</button>
-</form>
+function updateColorSelector() {
+  const container = document.getElementById('color-selector');
+  container.innerHTML = '';
+  for(let i=1; i<=8; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'color-btn';
+    if(i == selectedColor) btn.classList.add('selected');
+    btn.innerText = i + 'P';
+    btn.onclick = (e) => {
+      e.preventDefault();
+      selectedColor = i;
+      updateColorSelector();
+    };
+    container.appendChild(btn);
+  }
+}
+
+/* カード生成処理 */
+function generateCard() {
+  const canvas = document.getElementById('card-canvas');
+  const ctx = canvas.getContext('2d');
+  const accent = '#00ff99';
+
+  // 背景描画
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, 0, 800, 550);
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(15, 15, 770, 520);
+
+  // タイトル
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('HISOUTENSOKU PLAYER PROFILE', 40, 55);
+
+  function drawItem(label, value, x, y, size=18, color='#fff') {
+    ctx.fillStyle = accent;
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(label, x, y);
+    ctx.fillStyle = color;
+    ctx.font = size + 'px sans-serif';
+    ctx.fillText(value, x, y + 25);
+  }
+
+  // フォーム値取得
+  const name = document.getElementById('name').value || 'Nanashi';
+  const rank = document.getElementById('rank').value || '-';
+  const sub = document.getElementById('sub-chars').value || 'なし';
+  const style = document.querySelector('input[name="style"]:checked').value;
+  const side = document.querySelector('input[name="side"]:checked').value;
+  const time = document.getElementById('time').value || '-';
+  const device = document.getElementById('device').value || '-';
+  const matchup = document.getElementById('matchup').value || '-';
+  const other = document.getElementById('other-games').value || '-';
+  const comment = document.getElementById('comment').value || '-';
+  const tools = [
+    document.getElementById('tool-tenco').checked ? 'Tenco' : null,
+    document.getElementById('tool-punch').checked ? 'Punch' : null,
+    document.getElementById('tool-giu').checked ? 'giu' : null,
+    document.getElementById('tool-socro').checked ? 'socro' : null
+  ].filter(t => t).join(' / ') || 'None';
+
+  // テキスト配置
+  drawItem('PLAYER NAME', name, 45, 100, 30);
+  drawItem('RANK / RATE', rank, 45, 165, 22);
+  drawItem('MAIN CHARACTER', `${selectedChar} (${selectedColor}P)`, 45, 220);
+  drawItem('SUB CHARACTERS', sub, 45, 275, 16);
+  drawItem('STYLE / SIDE', `${style} / ${side}`, 45, 330);
+  drawItem('ACTIVITY / DEVICE', `${time} / ${device}`, 45, 385, 16);
+  drawItem('TOOLS', tools, 45, 440);
+  drawItem('MATCHUP / OTHER', `${matchup} [${other}]`, 45, 495, 15);
+  drawItem('COMMENT', comment, 460, 495, 14, '#aaa');
+
+  // キャラ画像描画
+  const img = new Image();
+  const folder = charData[selectedChar];
+  img.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
+
+  img.onload = () => {
+    ctx.shadowBlur = 15; ctx.shadowColor = accent;
+    ctx.drawImage(img, 460, 80, 280, 330);
+    ctx.shadowBlur = 0;
+    finalize();
+  };
+  img.onerror = () => {
+    ctx.fillStyle = '#222'; ctx.fillRect(460, 80, 280, 330);
+    finalize();
+  };
+
+  function finalize() {
+    const finalImg = document.getElementById('final-image');
+    finalImg.src = canvas.toDataURL('image/png');
+    finalImg.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
