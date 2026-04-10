@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールカードメーカー (比率維持版)</title>
+<title>非想天則 プロフィールカードメーカー</title>
 <style>
   :root {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
     --accent-color: #00ff99;
     --border-color: #444;
+    /* カードとフォームの横幅を統一 */
+    --card-width: 600px;
   }
 
   body {
@@ -17,20 +19,21 @@
     background-color: #121212;
     color: var(--text-color);
     margin: 0;
-    padding: 20px;
+    padding: 10px; /* 余白を少し削る */
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  h1 { color: var(--accent-color); text-shadow: 0 0 10px var(--accent-color); font-size: 1.5rem; }
+  h1 { color: var(--accent-color); text-shadow: 0 0 10px var(--accent-color); font-size: 1.2rem; text-align: center; }
 
   .container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column; /* 縦並びに固定して幅を合わせる */
     gap: 20px;
-    justify-content: center;
-    max-width: 1200px;
+    align-items: center;
+    width: 100%;
+    max-width: var(--card-width); /* 全体の最大幅を固定 */
   }
 
   #profile-form {
@@ -38,9 +41,8 @@
     padding: 20px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    width: 400px;
-    max-height: 85vh;
-    overflow-y: auto;
+    width: 100%; /* 親要素(max-width)に合わせる */
+    box-sizing: border-box;
   }
 
   .form-group { margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
@@ -48,12 +50,13 @@
   
   input[type="text"], select, textarea {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     background-color: #000;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     color: var(--text-color);
     box-sizing: border-box;
+    font-size: 16px; /* スマホでズームされないためのサイズ */
   }
 
   .inline-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
@@ -61,9 +64,9 @@
 
   .sub-char-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* 2列にして見やすく */
     gap: 5px;
-    max-height: 120px;
+    max-height: 150px;
     overflow-y: auto;
     background: #000;
     padding: 10px;
@@ -80,12 +83,20 @@
     font-weight: bold;
     cursor: pointer;
     margin-top: 10px;
+    font-size: 1rem;
   }
   button:hover { background-color: var(--accent-color); color: #000; box-shadow: 0 0 15px var(--accent-color); }
 
-  #output-area { text-align: center; width: 600px; }
+  #output-area { text-align: center; width: 100%; }
   canvas { display: none; }
-  #final-image { max-width: 100%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; }
+  #final-image { 
+    width: 100%; /* フォームと同じ幅になるよう調整 */
+    height: auto; 
+    border-radius: 8px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+    display: none; 
+    margin-top: 10px;
+  }
   .download-note { margin-top: 10px; color: #888; font-size: 0.8em; display: none; }
 
   #color-selection-container {
@@ -94,6 +105,12 @@
     border-radius: 4px;
     margin-top: 10px;
     display: none;
+  }
+
+  /* スマホ向けの微調整 */
+  @media (max-width: 600px) {
+    :root { --card-width: 100%; }
+    .sub-char-list { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -106,6 +123,11 @@
       <div class="form-group">
         <label>プレイヤー名</label>
         <input type="text" id="name" placeholder="Name" required>
+      </div>
+
+      <div class="form-group">
+        <label>天則歴</label>
+        <input type="text" id="history" placeholder="例: 2010年〜 / 歴5年">
       </div>
 
       <div class="form-group">
@@ -177,13 +199,14 @@
     </form>
 
     <div id="output-area">
-      <canvas id="card-canvas" width="600" height="500"></canvas>
+      <canvas id="card-canvas" width="600" height="550"></canvas>
       <img id="final-image" alt="Profile Card">
       <p class="download-note" id="download-note">画像を右クリックまたは長押しで保存してね</p>
     </div>
   </div>
 
 <script>
+/* (JavaScript部分は変更箇所のみ抜粋) */
 const commonColors = [
   { id: "1", label: "1P" }, { id: "2", label: "2P" },
   { id: "3", label: "3P" }, { id: "4", label: "4P" },
@@ -245,6 +268,7 @@ function generateCard() {
   const accent = '#00ff99';
 
   const name = document.getElementById('name').value || 'Nanashi';
+  const history = document.getElementById('history').value || '-'; // 追加項目
   const mainChar = document.getElementById('main-char').value;
   const colorId = document.getElementById('color-select').value;
   const subChars = Array.from(document.querySelectorAll('input[name="sub-char"]:checked')).map(el => el.value).join(', ') || 'なし';
@@ -275,6 +299,7 @@ function generateCard() {
   }
 
   drawItem('PLAYER NAME', name);
+  drawItem('HISTORY', history); // キャンバスに描画
   drawItem('MAIN CHARACTER', mainChar);
   drawItem('SUB CHARACTERS', subChars, true);
   drawItem('RANK / RATE', rank);
@@ -292,21 +317,12 @@ function generateCard() {
 
     img.onload = function() {
       ctx.imageSmoothingEnabled = false; 
-
-      const frameW = 160;
-      const frameH = 200;
-      const frameX = 410;
-      const frameY = 80;
-
-      let drawW = img.width;
-      let drawH = img.height;
+      const frameW = 160; const frameH = 200; const frameX = 410; const frameY = 80;
+      let drawW = img.width; let drawH = img.height;
       const ratio = Math.min(frameW / drawW, frameH / drawH);
-      drawW *= ratio;
-      drawH *= ratio;
-
+      drawW *= ratio; drawH *= ratio;
       const offsetX = frameX + (frameW - drawW) / 2;
       const offsetY = frameY + (frameH - drawH) / 2;
-
       ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
       finalize();
     };
