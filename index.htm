@@ -40,12 +40,10 @@
     border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box;
   }
 
-  /* キャラ選択グリッド */
   .char-grid {
     display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px;
   }
 
-  /* キャラボタン（スマホ向け基本設定） */
   .char-btn {
     cursor: pointer; border: 1px solid #333; border-radius: 4px; aspect-ratio: 1/1;
     background: #222; display: flex; align-items: center; justify-content: center;
@@ -53,7 +51,6 @@
     padding: 2px;
   }
 
-  /* PC・大画面向け（フォントサイズ調整） */
   @media (min-width: 480px) {
     .char-btn {
       font-size: 14px;
@@ -68,7 +65,6 @@
     box-shadow: inset 0 0 5px var(--accent-color); 
   }
 
-  /* カラー選択 */
   .color-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
   .color-btn {
     padding: 10px 12px; background: #333; border: 1px solid #555; color: #fff;
@@ -76,7 +72,6 @@
   }
   .color-btn.selected { background: var(--accent-color); color: #000; font-weight: bold; }
 
-  /* 縦並び選択肢 */
   .selection-stack { display: flex; flex-direction: column; gap: 8px; }
   .selection-stack label {
     display: flex; align-items: center; gap: 12px; background: #262626;
@@ -204,7 +199,6 @@ window.onload = () => {
   const subSelector = document.getElementById('sub-char-selector');
 
   Object.keys(charData).forEach(name => {
-    // メインキャラ用ボタン
     const mBtn = document.createElement('div');
     mBtn.className = 'char-btn';
     if(name === selectedMain) mBtn.classList.add('selected');
@@ -216,7 +210,6 @@ window.onload = () => {
     };
     mainSelector.appendChild(mBtn);
 
-    // サブキャラ用ボタン
     const sBtn = document.createElement('div');
     sBtn.className = 'char-btn';
     sBtn.innerHTML = `<span>${name.replace(' ', '<br>')}</span>`;
@@ -259,20 +252,20 @@ function generateCard() {
   ctx.fillStyle = '#0a0a0a';
   ctx.fillRect(0, 0, 800, 600);
   ctx.strokeStyle = accent;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 3; // 枠線を少し太く
   ctx.strokeRect(15, 15, 770, 570);
 
   ctx.fillStyle = accent;
-  ctx.font = 'bold 22px sans-serif';
-  ctx.fillText('HISOUTENSOKU PLAYER PROFILE', 40, 55);
+  ctx.font = 'bold 24px sans-serif';
+  ctx.fillText('HISOUTENSOKU PLAYER PROFILE', 45, 60);
 
-  function drawItem(label, value, x, y, size=18, color='#fff') {
+  function drawItem(label, value, x, y, size=20, color='#fff') {
     ctx.fillStyle = accent;
-    ctx.font = 'bold 12px sans-serif';
+    ctx.font = 'bold 13px sans-serif';
     ctx.fillText(label, x, y);
     ctx.fillStyle = color;
-    ctx.font = size + 'px sans-serif';
-    ctx.fillText(value, x, y + 25);
+    ctx.font = 'bold ' + size + 'px sans-serif';
+    ctx.fillText(value, x, y + 28);
   }
 
   const name = document.getElementById('name').value || 'Nanashi';
@@ -292,30 +285,32 @@ function generateCard() {
     document.getElementById('tool-socro').checked ? 'socro' : null
   ].filter(t => t).join(' / ') || 'None';
 
-  // 1項目ずつ描画
-  drawItem('PLAYER NAME', name, 45, 100, 32);
-  drawItem('RANK / RATE', rank, 45, 165, 22);
-  drawItem('MAIN CHARACTER', `${selectedMain} (${selectedColor}P)`, 45, 220);
-  drawItem('SUB CHARACTERS', subStr, 45, 275, 15);
-  drawItem('STYLE / SIDE', `${style} / ${side}`, 45, 330);
-  drawItem('ACTIVITY TIME', time, 45, 385);
-  drawItem('DEVICE', device, 45, 440);
-  drawItem('TOOLS', tools, 45, 495);
-  drawItem('MATCHUP / OTHER', `${matchup} [${other}]`, 45, 550, 15);
-  drawItem('COMMENT', comment, 460, 550, 14, '#aaa');
+  // テキスト描画位置とサイズをブラッシュアップ
+  drawItem('PLAYER NAME', name, 50, 110, 42); // プレイヤー名を最大化
+  drawItem('RANK / RATE', rank, 50, 180, 24);
+  drawItem('MAIN CHARACTER', `${selectedMain} (${selectedColor}P)`, 50, 240, 20);
+  drawItem('SUB CHARACTERS', subStr, 50, 300, 16);
+  drawItem('STYLE / SIDE', `${style} / ${side}`, 50, 360, 20);
+  drawItem('ACTIVITY TIME', time, 50, 420, 20);
+  drawItem('DEVICE', device, 50, 480, 20);
+  drawItem('TOOLS', tools, 50, 540, 20);
+  
+  // 右下に寄せる項目
+  drawItem('MATCHUP / OTHER', `${matchup} [${other}]`, 460, 500, 16);
+  drawItem('COMMENT', comment, 460, 560, 16, '#bbb');
 
   const img = new Image();
   const folder = charData[selectedMain];
   img.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
 
   img.onload = () => {
-    ctx.shadowBlur = 15; ctx.shadowColor = accent;
-    ctx.drawImage(img, 460, 80, 280, 330);
+    ctx.shadowBlur = 25; ctx.shadowColor = accent; // 光彩を強調
+    ctx.drawImage(img, 460, 90, 290, 340); // 画像サイズを微増
     ctx.shadowBlur = 0;
     finalize();
   };
   img.onerror = () => {
-    ctx.fillStyle = '#222'; ctx.fillRect(460, 80, 280, 330);
+    ctx.fillStyle = '#222'; ctx.fillRect(460, 90, 290, 340);
     finalize();
   };
 
