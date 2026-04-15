@@ -3,82 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールカードメーカー PRO</title>
+<title>非想天則 プロフィールメーカー - STEAMPUNK EDITION</title>
 <style>
-  :root { --bg-color: #1a1a1a; --text-color: #e0e0e0; --accent-color: #00ff99; --border-color: #444; --card-width: 600px; }
-  body { font-family: sans-serif; background-color: #121212; color: var(--text-color); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+  :root { 
+    --bg-color: #2b1e16; /* 焦げ茶 */
+    --text-color: #fdf5e6; /* アイボリー */
+    --accent-color: #daa520; /* 真鍮・金 */
+    --border-color: #5d4037; 
+    --card-width: 600px; 
+  }
+  body { 
+    font-family: 'Georgia', 'serif', 'Hiragino Mincho ProN', serif; 
+    background-color: #1a0f0a; 
+    color: var(--text-color); 
+    margin: 0; padding: 10px; 
+    display: flex; flex-direction: column; align-items: center; 
+  }
+  h1 { 
+    color: var(--accent-color); 
+    text-shadow: 2px 2px 4px #000; 
+    font-size: 1.2rem; margin-bottom: 20px; 
+    letter-spacing: 2px;
+  }
   .container { width: 100%; max-width: var(--card-width); display: flex; flex-direction: column; gap: 20px; }
-  #profile-form { background-color: var(--bg-color); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-sizing: border-box; }
-  .form-group { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+  #profile-form { 
+    background-color: var(--bg-color); 
+    padding: 20px; border-radius: 4px; 
+    border: 3px double var(--accent-color); /* 二重線でアンティーク感を出す */
+    box-sizing: border-box; 
+  }
+  .form-group { margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
   label { display: block; margin-bottom: 10px; font-weight: bold; color: var(--accent-color); font-size: 0.9em; }
-  input[type="text"], textarea { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
+  
+  input[type="text"], textarea { 
+    width: 100%; padding: 12px; background: #3e2723; border: 1px solid var(--accent-color); 
+    border-radius: 0; color: #fff; font-size: 16px; box-sizing: border-box; 
+  }
+
   .char-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
-  .char-btn { cursor: pointer; border: 1px solid #333; border-radius: 4px; aspect-ratio: 1/1; background: #222; display: flex; align-items: center; justify-content: center; color: #888; font-size: 11px; text-align: center; }
-  .char-btn.selected { border-color: var(--accent-color); color: var(--accent-color); background: #000; box-shadow: inset 0 0 5px var(--accent-color); }
-  .color-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
-  .color-btn { padding: 10px 12px; background: #333; border: 1px solid #555; color: #fff; cursor: pointer; border-radius: 4px; font-size: 12px; }
+  .char-btn { 
+    cursor: pointer; border: 1px solid #5d4037; aspect-ratio: 1/1; background: #3e2723; 
+    display: flex; align-items: center; justify-content: center; color: #a1887f; font-size: 11px; text-align: center; 
+  }
+  .char-btn.selected { 
+    border: 2px solid var(--accent-color); color: #fff; background: #5d4037; 
+    box-shadow: inset 0 0 10px rgba(218, 165, 32, 0.5);
+  }
+
+  .color-btn { padding: 10px 12px; background: #3e2723; border: 1px solid #5d4037; color: #fff; cursor: pointer; font-size: 12px; }
   .color-btn.selected { background: var(--accent-color); color: #000; font-weight: bold; }
-  .selection-stack { display: flex; flex-direction: column; gap: 8px; }
-  .selection-stack label { display: flex; align-items: center; gap: 12px; background: #262626; padding: 12px; border-radius: 8px; color: #fff; font-weight: normal; margin-bottom: 0; }
-  button#generate-btn { width: 100%; padding: 18px; background: #000; color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+
+  .selection-stack label { display: flex; align-items: center; gap: 12px; background: #3e2723; padding: 12px; color: #fff; margin-bottom: 5px; border: 1px solid #5d4037; }
+
+  button#generate-btn { 
+    width: 100%; padding: 18px; background: var(--accent-color); color: #000; 
+    border: none; font-size: 1.1rem; font-weight: bold; cursor: pointer; 
+    text-transform: uppercase; letter-spacing: 2px;
+  }
+  button#generate-btn:hover { background: #ffca28; }
+
   #output-area { width: 100%; margin-top: 20px; text-align: center; }
   #card-canvas { display: none; }
-  #final-image { width: 100%; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+  #final-image { width: 100%; border: 5px solid var(--accent-color); }
 </style>
 </head>
 <body>
 
-  <h1>HISOUTENSOKU PROFILE GENERATOR</h1>
+  <h1>⚙ HISOUTENSOKU CHRONICLE GENERATOR ⚙</h1>
 
   <div class="container">
     <form id="profile-form">
-      <div class="form-group"><label>プレイヤー名</label><input type="text" id="name" maxlength="15" placeholder="最大15文字"></div>
-      <div class="form-group"><label>段位 / レート</label><input type="text" id="rank" maxlength="20" placeholder="最大20文字"></div>
+      <div class="form-group"><label>探索者名 (PLAYER NAME)</label><input type="text" id="name" maxlength="15"></div>
+      <div class="form-group"><label>階級 (RANK / RATE)</label><input type="text" id="rank" maxlength="20"></div>
       
       <div class="form-group">
-        <label>メインキャラ選択</label>
+        <label>主軸機体 (MAIN CHARACTER)</label>
         <div id="main-char-selector" class="char-grid"></div>
-        <label style="margin-top: 15px;">カラー選択</label>
-        <div id="color-selector" class="color-chips"></div>
+        <label style="margin-top: 15px;">識別色 (COLOR)</label>
+        <div id="color-selector" class="color-chips" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
       </div>
 
-      <div class="form-group"><label>サブキャラ選択</label><div id="sub-char-selector" class="char-grid"></div></div>
+      <div class="form-group"><label>補助機体 (SUB CHARACTERS)</label><div id="sub-char-selector" class="char-grid"></div></div>
 
       <div class="form-group">
-        <label>プレイスタイル</label>
+        <label>行動指針 (STYLE)</label>
         <div class="selection-stack">
-          <label><input type="radio" name="style" value="ガチ勢" checked> ガチ勢</label>
-          <label><input type="radio" name="style" value="エンジョイ"> エンジョイ</label>
+          <label><input type="radio" name="style" value="HARD-CORE" checked> 集中運用 (ガチ)</label>
+          <label><input type="radio" name="style" value="ENJOY"> 汎用運用 (エンジョイ)</label>
         </div>
       </div>
 
       <div class="form-group">
-        <label>ホスト / クラ設定</label>
+        <label>通信設定 (HOST / CLIENT)</label>
         <div class="selection-stack">
-          <label><input type="radio" name="side" value="ホスト派" checked> ホスト派</label>
-          <label><input type="radio" name="side" value="クラ派"> クラ派</label>
-          <label><input type="radio" name="side" value="両方可"> 両方可</label>
+          <label><input type="radio" name="side" value="HOST" checked> 発信側 (HOST)</label>
+          <label><input type="radio" name="side" value="CLIENT"> 受信側 (CLIENT)</label>
+          <label><input type="radio" name="side" value="BOTH"> 双方対応</label>
         </div>
       </div>
 
-      <div class="form-group"><label>活動時間帯</label><input type="text" id="time" maxlength="20" placeholder="例: 平日22時〜"></div>
-      <div class="form-group"><label>使用デバイス</label><input type="text" id="device" maxlength="20" placeholder="例: RAP"></div>
+      <div class="form-group"><label>稼働時間帯</label><input type="text" id="time" maxlength="20"></div>
+      <div class="form-group"><label>操作端末 (DEVICE)</label><input type="text" id="device" maxlength="20"></div>
       
       <div class="form-group">
-        <label>外部ツール</label>
+        <label>外部補助機関 (TOOLS)</label>
         <div class="selection-stack">
           <label><input type="checkbox" id="tool-tenco" checked> Tenco</label>
-          <label><input type="checkbox" id="tool-punch"> パンチ</label>
+          <label><input type="checkbox" id="tool-punch"> Punch</label>
           <label><input type="checkbox" id="tool-giu"> giu</label>
-          <label><input type="checkbox" id="tool-socro"> ソクロ</label>
+          <label><input type="checkbox" id="tool-socro"> socro</label>
         </div>
       </div>
 
-      <div class="form-group"><label>得意・苦手</label><input type="text" id="matchup" maxlength="30" placeholder="最大30文字"></div>
-      <div class="form-group"><label>天則以外の趣味</label><input type="text" id="other-games" maxlength="30" placeholder="最大30文字"></div>
-      <div class="form-group"><label>一言コメント</label><textarea id="comment" maxlength="100" rows="3" placeholder="最大100文字"></textarea></div>
+      <div class="form-group"><label>得意・苦手構成</label><input type="text" id="matchup" maxlength="30"></div>
+      <div class="form-group"><label>他関心事 (OTHER INTERESTS)</label><input type="text" id="other-games" maxlength="30"></div>
+      <div class="form-group"><label>備考録 (COMMENT)</label><textarea id="comment" maxlength="100" rows="3"></textarea></div>
 
-      <button type="button" id="generate-btn" onclick="generateCard()">カードを生成する</button>
+      <button type="button" id="generate-btn" onclick="generateCard()">記録を生成する</button>
     </form>
 
     <div id="output-area">
@@ -127,27 +168,29 @@ function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
 }
 
 function generateCard() {
-  const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), accent = '#00ff99';
-  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, 800, 800);
-  ctx.strokeStyle = accent; ctx.lineWidth = 3; ctx.strokeRect(15, 15, 770, 770);
+  const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
   
-  ctx.fillStyle = accent; ctx.font = 'bold 24px sans-serif'; ctx.fillText('■ HISOUTENSOKU PLAYER PROFILE ■', 45, 65);
+  // 背景（古びた金属/木目調）
+  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 800);
+  // 二重枠線
+  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 760);
+  ctx.lineWidth = 1; ctx.strokeRect(30, 30, 740, 740);
+  
+  ctx.fillStyle = brass; ctx.font = 'bold 24px serif'; ctx.fillText('⚙ HISOUTENSOKU CHRONICLE ⚙', 50, 75);
 
-  // 描画ヘルパー：項目ラベル用（緑）
-  const drawLbl = (l, x, y) => { ctx.fillStyle = accent; ctx.font = 'bold 13px sans-serif'; ctx.fillText(`■ ${l} ■`, x, y); };
-  // 描画ヘルパー：入力データ用（白）
-  const drawDat = (d, x, y, f) => { ctx.fillStyle = '#ffffff'; ctx.font = f; ctx.fillText(d, x, y); };
+  const drawLbl = (l, x, y) => { ctx.fillStyle = brass; ctx.font = 'bold 13px serif'; ctx.fillText(`【 ${l} 】`, x, y); };
+  const drawDat = (d, x, y, f) => { ctx.fillStyle = '#fdf5e6'; ctx.font = f; ctx.fillText(d, x, y); };
   
-  const name = document.getElementById('name').value || 'Nanashi';
-  const rank = document.getElementById('rank').value || '-';
-  const subStr = selectedSubs.join(', ') || 'なし';
+  const name = document.getElementById('name').value || 'Unknown';
+  const rank = document.getElementById('rank').value || '---';
+  const subStr = selectedSubs.join(', ') || '---';
   const style = document.querySelector('input[name="style"]:checked').value;
   const side = document.querySelector('input[name="side"]:checked').value;
-  const time = document.getElementById('time').value || '-';
-  const device = document.getElementById('device').value || '-';
-  const matchup = document.getElementById('matchup').value || '-';
-  const other = document.getElementById('other-games').value || '-';
-  const comment = document.getElementById('comment').value || '-';
+  const time = document.getElementById('time').value || '---';
+  const device = document.getElementById('device').value || '---';
+  const matchup = document.getElementById('matchup').value || '---';
+  const other = document.getElementById('other-games').value || '---';
+  const comment = document.getElementById('comment').value || '---';
   const tools = [
     document.getElementById('tool-tenco').checked ? 'Tenco' : null,
     document.getElementById('tool-punch').checked ? 'Punch' : null,
@@ -155,46 +198,43 @@ function generateCard() {
     document.getElementById('tool-socro').checked ? 'socro' : null
   ].filter(t => t).join(' / ') || 'None';
 
-  // --- 左側エリア ---
-  drawLbl('PLAYER NAME', 50, 130);
-  drawDat(name, 50, 180, 'bold 44px sans-serif');
+  drawLbl('PILOT NAME', 55, 130);
+  drawDat(name, 55, 185, 'bold 46px serif');
 
-  drawLbl('RANK / RATE', 50, 225);
-  drawDat(rank, 50, 255, 'bold 24px sans-serif');
+  drawLbl('CURRENT RANK', 55, 230);
+  drawDat(rank, 55, 260, 'bold 24px serif');
 
-  drawLbl('MAIN CHARACTER', 50, 300);
-  drawDat(`${selectedMain} (${selectedColor}P)`, 50, 330, 'bold 20px sans-serif');
+  drawLbl('PRIMARY UNIT', 55, 305);
+  drawDat(`${selectedMain} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
 
-  drawLbl('SUB CHARACTERS', 50, 375);
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 16px sans-serif';
-  let subBottomY = drawWrap(ctx, subStr, 50, 405, 380, 24);
+  drawLbl('SUPPORT UNITS', 55, 385);
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 16px serif';
+  let subBottomY = drawWrap(ctx, subStr, 55, 415, 380, 24);
 
   let nextY = subBottomY + 50;
-  drawLbl('STYLE / SIDE / TIME', 50, nextY);
-  drawDat(`${style} / ${side} / ${time}`, 50, nextY + 30, 'bold 18px sans-serif');
+  drawLbl('TACTICS / COMMS / TIME', 55, nextY);
+  drawDat(`${style} / ${side} / ${time}`, 55, nextY + 30, 'bold 18px serif');
 
-  drawLbl('DEVICE / TOOLS', 50, nextY + 85);
-  drawDat(`${device} [ ${tools} ]`, 50, nextY + 115, 'bold 17px sans-serif');
+  drawLbl('EQUIPMENT / TOOLS', 55, nextY + 85);
+  drawDat(`${device} [ ${tools} ]`, 55, nextY + 115, 'bold 17px serif');
 
-  // --- 右側エリア ---
-  drawLbl('MATCHUP', 460, 460);
-  drawDat(matchup, 460, 490, 'bold 16px sans-serif');
+  drawLbl('COMPATIBILITY', 460, 460);
+  drawDat(matchup, 460, 490, 'bold 16px serif');
 
-  drawLbl('OTHER INTERESTS', 460, 535);
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 15px sans-serif';
+  drawLbl('EXTERNAL RECORDS', 460, 535);
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   drawWrap(ctx, other, 460, 565, 290, 22);
 
-  drawLbl('COMMENT', 460, 625);
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 14px sans-serif';
+  drawLbl('LOGBOOK MEMO', 460, 625);
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
   drawWrap(ctx, comment, 460, 655, 290, 20);
 
-  // キャラ画像
   const img = new Image(); const folder = charData[selectedMain];
   img.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
   img.onload = () => {
-    ctx.shadowBlur = 25; ctx.shadowColor = accent;
+    // 画像の縁取りを真鍮風に
+    ctx.strokeStyle = brass; ctx.lineWidth = 5; ctx.strokeRect(455, 85, 300, 350);
     ctx.drawImage(img, 460, 90, 290, 340);
-    ctx.shadowBlur = 0;
     document.getElementById('final-image').src = canvas.toDataURL('image/png');
     document.getElementById('final-image').style.display = 'block';
   };
