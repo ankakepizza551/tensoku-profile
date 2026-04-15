@@ -52,10 +52,7 @@
   }
 
   @media (min-width: 480px) {
-    .char-btn {
-      font-size: 14px;
-      font-weight: bold;
-    }
+    .char-btn { font-size: 14px; font-weight: bold; }
   }
 
   .char-btn.selected { 
@@ -244,6 +241,24 @@ function updateColorSelector() {
   }
 }
 
+// テキスト折り返し描画用ヘルパー
+function drawTextWithWrap(ctx, text, x, y, maxWidth, lineHeight) {
+  let line = '';
+  let currentY = y;
+  for (let n = 0; n < text.length; n++) {
+    let testLine = line + text[n];
+    let metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      ctx.fillText(line, x, currentY);
+      line = text[n];
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, currentY);
+}
+
 function generateCard() {
   const canvas = document.getElementById('card-canvas');
   const ctx = canvas.getContext('2d');
@@ -259,13 +274,10 @@ function generateCard() {
   ctx.font = 'bold 24px sans-serif';
   ctx.fillText('HISOUTENSOKU PLAYER PROFILE', 45, 60);
 
-  function drawItem(label, value, x, y, size=20, color='#fff') {
+  function drawLabel(label, x, y) {
     ctx.fillStyle = accent;
     ctx.font = 'bold 13px sans-serif';
     ctx.fillText(label, x, y);
-    ctx.fillStyle = color;
-    ctx.font = 'bold ' + size + 'px sans-serif';
-    ctx.fillText(value, x, y + 28);
   }
 
   const name = document.getElementById('name').value || 'Nanashi';
@@ -285,20 +297,49 @@ function generateCard() {
     document.getElementById('tool-socro').checked ? 'socro' : null
   ].filter(t => t).join(' / ') || 'None';
 
-  // 左側のテキスト項目の配置を少し上に詰めて調整
-  drawItem('PLAYER NAME', name, 50, 105, 42);
-  drawItem('RANK / RATE', rank, 50, 175, 24);
-  drawItem('MAIN CHARACTER', `${selectedMain} (${selectedColor}P)`, 50, 230, 20);
-  drawItem('SUB CHARACTERS', subStr, 50, 285, 16);
-  drawItem('STYLE / SIDE', `${style} / ${side}`, 50, 340, 20);
-  drawItem('ACTIVITY TIME', time, 50, 395, 20);
-  drawItem('DEVICE', device, 50, 450, 20);
-  drawItem('TOOLS', tools, 50, 505, 20);
-  
-  // MATCHUPとOTHERを独立させて右下に配置
-  drawItem('MATCHUP', matchup, 50, 560, 16); // 左下に配置
-  drawItem('OTHER INTERESTS', other, 460, 500, 16); // 画像の下あたり
-  drawItem('COMMENT', comment, 460, 560, 16, '#bbb');
+  // 左カラム描画
+  drawLabel('PLAYER NAME', 50, 105);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 42px sans-serif';
+  ctx.fillText(name, 50, 140);
+
+  drawLabel('RANK / RATE', 50, 185);
+  ctx.font = 'bold 24px sans-serif';
+  ctx.fillText(rank, 50, 213);
+
+  drawLabel('MAIN CHARACTER', 50, 245);
+  ctx.font = 'bold 20px sans-serif';
+  ctx.fillText(`${selectedMain} (${selectedColor}P)`, 50, 273);
+
+  drawLabel('SUB CHARACTERS', 50, 305);
+  ctx.font = 'bold 16px sans-serif';
+  drawTextWithWrap(ctx, subStr, 50, 330, 380, 22);
+
+  drawLabel('STYLE / SIDE', 50, 385);
+  ctx.font = 'bold 20px sans-serif';
+  ctx.fillText(`${style} / ${side}`, 50, 413);
+
+  drawLabel('ACTIVITY TIME', 50, 445);
+  ctx.fillText(time, 50, 473);
+
+  drawLabel('DEVICE / TOOLS', 50, 505);
+  ctx.font = 'bold 18px sans-serif';
+  ctx.fillText(`${device} [ ${tools} ]`, 50, 533);
+
+  drawLabel('MATCHUP', 50, 565);
+  ctx.font = 'bold 16px sans-serif';
+  ctx.fillText(matchup, 130, 565);
+
+  // 右カラム描画
+  drawLabel('OTHER INTERESTS', 460, 465);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 16px sans-serif';
+  drawTextWithWrap(ctx, other, 460, 490, 290, 22);
+
+  drawLabel('COMMENT', 460, 540);
+  ctx.fillStyle = '#bbb';
+  ctx.font = 'bold 15px sans-serif';
+  drawTextWithWrap(ctx, comment, 460, 565, 290, 20);
 
   const img = new Image();
   const folder = charData[selectedMain];
@@ -324,3 +365,4 @@ function generateCard() {
 </script>
 </body>
 </html>
+
