@@ -2,120 +2,128 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>東方非想天則プロフィールカード作成ツール</title>
+    <title>東方非想天則 プロフィールカードメーカー</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #2b2b2b; color: #ddd; }
         
-        /* 入力エリア（以前のシンプルなスタイル） */
+        /* 入力エリア */
         #controls {
-            background: white;
+            background: #3d3d3d;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin: 20px;
-            width: 550px;
+            width: 600px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid #555;
         }
-        .input-item { margin-bottom: 10px; }
-        label { display: inline-block; width: 100px; font-weight: bold; }
-        input[type="text"] { width: 300px; padding: 5px; }
+        .input-item { margin-bottom: 12px; display: flex; align-items: center; }
+        label { width: 120px; font-weight: bold; color: #da9100; }
+        input[type="text"] { flex: 1; padding: 6px; background: #222; border: 1px solid #555; color: #fff; }
 
-        /* タグ選択ボタン */
+        /* スタイルタグ */
         .tag-btn {
-            padding: 5px 10px;
-            margin: 2px;
-            border: 1px solid #ccc;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 3px;
+            padding: 4px 10px; margin: 2px; border: 1px solid #666;
+            background: #444; color: #ccc; cursor: pointer; font-size: 12px;
         }
-        .tag-btn.active {
-            background: #e0e0e0;
-            border-color: #888;
-            font-weight: bold;
-        }
+        .tag-btn.active { background: #865c2b; color: #fff; border-color: #da9100; }
 
-        /* カード本体（以前の配色・レイアウト） */
+        /* --- カード本体（スチームパンク調） --- */
         #card {
             position: relative;
             width: 600px;
             height: 350px;
-            background: #fff; /* 背景色を白に戻す */
-            border: 2px solid #333;
+            background: #e8e2d0; /* 古びた紙のような色 */
+            border: 8px double #5c4033; /* 濃い茶色の二重線 */
             overflow: hidden;
-            font-family: 'Noto Serif JP', serif; /* フォントは和風 */
+            font-family: 'Noto Serif JP', serif;
+            color: #332211;
         }
 
-        /* 網掛け（ドット）の装飾 */
+        /* 網掛け（以前のドットをスチームパンク風に） */
         .grid-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(rgba(0,0,0,0.1) 1px, transparent 1px);
-            background-size: 5px 5px;
+            background-image: radial-gradient(#bc9a7c 1px, transparent 1px);
+            background-size: 6px 6px;
+            opacity: 0.3;
             z-index: 1;
         }
+
+        /* 歯車の装飾（スチームパンク要素） */
+        .gear {
+            position: absolute;
+            color: #bc9a7c;
+            opacity: 0.2;
+            font-size: 120px;
+            z-index: 0;
+            user-select: none;
+        }
+        #gear1 { top: -20px; right: -30px; transform: rotate(15deg); }
+        #gear2 { bottom: -40px; left: -30px; transform: rotate(-10deg); font-size: 180px;}
 
         .card-content {
             position: relative;
             z-index: 2;
-            padding: 30px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 10px;
         }
 
-        #out-name {
-            font-size: 36px;
-            border-bottom: 2px solid #333;
-            margin-bottom: 20px;
-        }
+        .main-info { display: flex; flex-direction: column; gap: 8px; }
 
-        .info-row { margin-bottom: 15px; font-size: 20px; }
-        .info-label { font-size: 14px; color: #666; display: block; }
+        /* 前の項目構成を再現 */
+        #out-name { font-size: 38px; border-bottom: 3px solid #5c4033; margin-bottom: 5px; }
+        .title-line { font-size: 18px; color: #865c2b; font-style: italic; }
 
-        #out-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .info-row { margin-top: 10px; }
+        .info-label { font-size: 12px; color: #7a5e48; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .info-val { font-size: 18px; border-left: 3px solid #865c2b; padding-left: 10px; margin-top: 2px; }
+
+        #out-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
         .tag-display {
-            background: #f0f0f0;
-            border: 1px solid #ccc;
-            padding: 2px 8px;
-            font-size: 16px;
-            border-radius: 4px;
+            background: rgba(134, 92, 43, 0.15);
+            border: 1px solid #865c2b;
+            padding: 1px 6px; font-size: 14px; color: #5c4033;
         }
 
-        /* アイコン枠（作成中とのことなので枠だけ維持） */
         #icon-preview {
-            position: absolute;
-            right: 30px;
-            bottom: 30px;
-            width: 150px;
-            height: 150px;
-            border: 2px dashed #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
+            width: 160px; height: 220px;
+            border: 2px solid #865c2b;
+            background: rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: #865c2b;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
 
         #save-button {
-            margin-top: 20px;
-            padding: 10px 30px;
-            background: #444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            margin-top: 20px; padding: 12px 40px;
+            background: #865c2b; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: bold;
         }
-        #save-button:hover { background: #666; }
+        #save-button:hover { background: #5c4033; }
     </style>
 </head>
 <body>
 
     <div id="controls">
         <div class="input-item">
+            <label>称号</label>
+            <input type="text" id="in-title" placeholder="例：有頂天の才娘" oninput="sync()">
+        </div>
+        <div class="input-item">
             <label>名前</label>
             <input type="text" id="in-name" oninput="sync()">
         </div>
         <div class="input-item">
-            <label>コメント</label>
+            <label>メインキャラ</label>
+            <input type="text" id="in-main" oninput="sync()">
+        </div>
+        <div class="input-item">
+            <label>一言コメント</label>
             <input type="text" id="in-comment" oninput="sync()">
         </div>
         <div class="input-item">
@@ -125,7 +133,6 @@
                 <button class="tag-btn" onclick="toggleTag(this)">固め重視</button>
                 <button class="tag-btn" onclick="toggleTag(this)">火力重視</button>
                 <button class="tag-btn" onclick="toggleTag(this)">愛キャラ勢</button>
-                <button class="tag-btn" onclick="toggleTag(this)">対戦募集中</button>
             </div>
         </div>
         <button id="save-button" onclick="downloadCard()">画像として保存</button>
@@ -133,41 +140,47 @@
 
     <div id="card">
         <div class="grid-overlay"></div>
+        <div class="gear" id="gear1">⚙</div>
+        <div class="gear" id="gear2">⚙</div>
+
         <div class="card-content">
-            <div class="info-label">PLAYER NAME</div>
-            <div id="out-name">名前未設定</div>
-            
-            <div class="info-row">
-                <div class="info-label">PLAY STYLE</div>
-                <div id="out-tags"></div>
+            <div class="main-info">
+                <div id="out-title" class="title-line">称号なし</div>
+                <div id="out-name">名前未設定</div>
+                
+                <div class="info-row">
+                    <div class="info-label">Main Character</div>
+                    <div id="out-main" class="info-val">未設定</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Play Style</div>
+                    <div id="out-tags"></div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Comment</div>
+                    <div id="out-comment" class="info-val">よろしくお願いします。</div>
+                </div>
             </div>
 
-            <div class="info-row">
-                <div class="info-label">COMMENT</div>
-                <div id="out-comment">よろしくお願いします。</div>
-            </div>
+            <div id="icon-preview">ICON AREA</div>
         </div>
-        <div id="icon-preview">アイコン枠</div>
     </div>
 
     <script>
-        // 文字入力の同期
         function sync() {
-            const name = document.getElementById('in-name').value;
-            const comment = document.getElementById('in-comment').value;
-            
-            document.getElementById('out-name').innerText = name || "名前未設定";
-            document.getElementById('out-comment').innerText = comment || "よろしくお願いします。";
+            document.getElementById('out-title').innerText = document.getElementById('in-title').value || "称号なし";
+            document.getElementById('out-name').innerText = document.getElementById('in-name').value || "名前未設定";
+            document.getElementById('out-main').innerText = document.getElementById('in-main').value || "未設定";
+            document.getElementById('out-comment').innerText = document.getElementById('in-comment').value || "よろしくお願いします。";
         }
 
-        // タグの切り替え
         function toggleTag(btn) {
             btn.classList.toggle('active');
             const outTags = document.getElementById('out-tags');
             outTags.innerHTML = '';
-            
-            const activeBtns = document.querySelectorAll('.tag-btn.active');
-            activeBtns.forEach(b => {
+            document.querySelectorAll('.tag-btn.active').forEach(b => {
                 const span = document.createElement('span');
                 span.className = 'tag-display';
                 span.innerText = b.innerText;
@@ -175,12 +188,11 @@
             });
         }
 
-        // 画像保存
         function downloadCard() {
             const cardElement = document.getElementById('card');
-            html2canvas(cardElement).then(canvas => {
+            html2canvas(cardElement, { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'th123-profile.png';
+                link.download = 'th123_profile_steampunk.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
