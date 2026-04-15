@@ -5,83 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>非想天則 プロフィールカードメーカー PRO</title>
 <style>
-  :root {
-    --bg-color: #1a1a1a;
-    --text-color: #e0e0e0;
-    --accent-color: #00ff99;
-    --border-color: #444;
-    --card-width: 600px;
-  }
-
-  body {
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
-    background-color: #121212;
-    color: var(--text-color);
-    margin: 0; padding: 10px;
-    display: flex; flex-direction: column; align-items: center;
-  }
-
-  h1 { color: var(--accent-color); text-shadow: 0 0 10px var(--accent-color); font-size: 1.2rem; margin-bottom: 20px; }
-
+  :root { --bg-color: #1a1a1a; --text-color: #e0e0e0; --accent-color: #00ff99; --border-color: #444; --card-width: 600px; }
+  body { font-family: sans-serif; background-color: #121212; color: var(--text-color); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
   .container { width: 100%; max-width: var(--card-width); display: flex; flex-direction: column; gap: 20px; }
-
-  #profile-form {
-    background-color: var(--bg-color);
-    padding: 20px; border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-sizing: border-box;
-  }
-
+  #profile-form { background-color: var(--bg-color); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-sizing: border-box; }
   .form-group { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
   label { display: block; margin-bottom: 10px; font-weight: bold; color: var(--accent-color); font-size: 0.9em; }
-  
-  input[type="text"], textarea {
-    width: 100%; padding: 12px; background: #000; border: 1px solid var(--border-color);
-    border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box;
-  }
-
-  .char-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px;
-  }
-
-  .char-btn {
-    cursor: pointer; border: 1px solid #333; border-radius: 4px; aspect-ratio: 1/1;
-    background: #222; display: flex; align-items: center; justify-content: center;
-    transition: 0.2s; color: #888; font-size: 11px; text-align: center; line-height: 1.2;
-    padding: 2px;
-  }
-
-  @media (min-width: 480px) {
-    .char-btn { font-size: 14px; font-weight: bold; }
-  }
-
-  .char-btn.selected { 
-    border-color: var(--accent-color); 
-    color: var(--accent-color); 
-    background: #000; 
-    box-shadow: inset 0 0 5px var(--accent-color); 
-  }
-
+  input[type="text"], textarea { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
+  .char-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+  .char-btn { cursor: pointer; border: 1px solid #333; border-radius: 4px; aspect-ratio: 1/1; background: #222; display: flex; align-items: center; justify-content: center; color: #888; font-size: 11px; text-align: center; }
+  .char-btn.selected { border-color: var(--accent-color); color: var(--accent-color); background: #000; box-shadow: inset 0 0 5px var(--accent-color); }
   .color-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
-  .color-btn {
-    padding: 10px 12px; background: #333; border: 1px solid #555; color: #fff;
-    cursor: pointer; border-radius: 4px; font-size: 12px;
-  }
+  .color-btn { padding: 10px 12px; background: #333; border: 1px solid #555; color: #fff; cursor: pointer; border-radius: 4px; font-size: 12px; }
   .color-btn.selected { background: var(--accent-color); color: #000; font-weight: bold; }
-
   .selection-stack { display: flex; flex-direction: column; gap: 8px; }
-  .selection-stack label {
-    display: flex; align-items: center; gap: 12px; background: #262626;
-    padding: 12px; border-radius: 8px; color: #fff; font-weight: normal; margin-bottom: 0;
-  }
-
-  button#generate-btn {
-    width: 100%; padding: 18px; background: #000; color: var(--accent-color);
-    border: 2px solid var(--accent-color); border-radius: 8px;
-    font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
-  }
-  button#generate-btn:hover { background: var(--accent-color); color: #000; }
-
+  .selection-stack label { display: flex; align-items: center; gap: 12px; background: #262626; padding: 12px; border-radius: 8px; color: #fff; font-weight: normal; margin-bottom: 0; }
+  button#generate-btn { width: 100%; padding: 18px; background: #000; color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
   #output-area { width: 100%; margin-top: 20px; text-align: center; }
   #card-canvas { display: none; }
   #final-image { width: 100%; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
@@ -93,16 +32,9 @@
 
   <div class="container">
     <form id="profile-form">
-      <div class="form-group">
-        <label>プレイヤー名</label>
-        <input type="text" id="name" placeholder="Name">
-      </div>
-
-      <div class="form-group">
-        <label>段位 / レート</label>
-        <input type="text" id="rank" placeholder="例: Lunatic / 1650">
-      </div>
-
+      <div class="form-group"><label>プレイヤー名</label><input type="text" id="name" maxlength="15" placeholder="最大15文字"></div>
+      <div class="form-group"><label>段位 / レート</label><input type="text" id="rank" maxlength="20" placeholder="最大20文字"></div>
+      
       <div class="form-group">
         <label>メインキャラ選択</label>
         <div id="main-char-selector" class="char-grid"></div>
@@ -110,38 +42,23 @@
         <div id="color-selector" class="color-chips"></div>
       </div>
 
-      <div class="form-group">
-        <label>サブキャラ選択（複数回答可）</label>
-        <div id="sub-char-selector" class="char-grid"></div>
-      </div>
+      <div class="form-group"><label>サブキャラ選択</label><div id="sub-char-selector" class="char-grid"></div></div>
 
       <div class="form-group">
-        <label>プレイスタイル</label>
+        <label>プレイスタイル / ホスト・クラ</label>
         <div class="selection-stack">
           <label><input type="radio" name="style" value="ガチ勢" checked> ガチ勢</label>
           <label><input type="radio" name="style" value="エンジョイ"> エンジョイ</label>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>ホスト / クラ設定</label>
-        <div class="selection-stack">
+          <hr style="width:100%; border:0; border-top:1px solid #444;">
           <label><input type="radio" name="side" value="ホスト派" checked> ホスト派</label>
           <label><input type="radio" name="side" value="クラ派"> クラ派</label>
           <label><input type="radio" name="side" value="両方可"> 両方可</label>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>活動時間帯</label>
-        <input type="text" id="time" placeholder="例: 平日22時〜">
-      </div>
-
-      <div class="form-group">
-        <label>使用デバイス</label>
-        <input type="text" id="device" placeholder="例: RAP">
-      </div>
-
+      <div class="form-group"><label>活動時間帯</label><input type="text" id="time" maxlength="20" placeholder="例: 平日22時〜"></div>
+      <div class="form-group"><label>使用デバイス</label><input type="text" id="device" maxlength="20" placeholder="例: RAP"></div>
+      
       <div class="form-group">
         <label>外部ツール</label>
         <div class="selection-stack">
@@ -152,20 +69,9 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label>得意キャラ / 苦手キャラ</label>
-        <input type="text" id="matchup" placeholder="得意: 霊夢 / 苦手: 萃香">
-      </div>
-
-      <div class="form-group">
-        <label>天則以外のゲーム・趣味</label>
-        <input type="text" id="other-games" placeholder="例: スト6、DTMなど">
-      </div>
-
-      <div class="form-group">
-        <label>一言コメント</label>
-        <textarea id="comment" rows="3" maxlength="100" placeholder="自由に入力してください"></textarea>
-      </div>
+      <div class="form-group"><label>得意・苦手</label><input type="text" id="matchup" maxlength="30" placeholder="最大30文字"></div>
+      <div class="form-group"><label>天則以外の趣味</label><input type="text" id="other-games" maxlength="30" placeholder="最大30文字"></div>
+      <div class="form-group"><label>一言コメント</label><textarea id="comment" maxlength="100" rows="3" placeholder="最大100文字"></textarea></div>
 
       <button type="button" id="generate-btn" onclick="generateCard()">カードを生成する</button>
     </form>
@@ -173,7 +79,6 @@
     <div id="output-area">
       <canvas id="card-canvas" width="800" height="800"></canvas>
       <img id="final-image" alt="Profile Card" style="display:none;">
-      <p style="color: #888; font-size: 0.8em; margin-top: 10px;">画像を長押しして保存してね</p>
     </div>
   </div>
 
@@ -203,19 +108,17 @@ function updateColorSelector() {
   }
 }
 
-// 改行描画用
 function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
   let line = '';
   for (let n = 0; n < text.length; n++) {
     let testLine = line + text[n];
     if (ctx.measureText(testLine).width > maxWidth && n > 0) {
       ctx.fillText(line, x, y);
-      line = text[n];
-      y += lineHeight;
+      line = text[n]; y += lineHeight;
     } else { line = testLine; }
   }
   ctx.fillText(line, x, y);
-  return y; // 最後の描画位置を返す
+  return y;
 }
 
 function generateCard() {
@@ -223,9 +126,10 @@ function generateCard() {
   ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, 800, 800);
   ctx.strokeStyle = accent; ctx.lineWidth = 3; ctx.strokeRect(15, 15, 770, 770);
   
-  ctx.fillStyle = accent; ctx.font = 'bold 24px sans-serif'; ctx.fillText('HISOUTENSOKU PLAYER PROFILE', 45, 65);
+  ctx.fillStyle = accent; ctx.font = 'bold 24px sans-serif'; ctx.fillText('■ HISOUTENSOKU PLAYER PROFILE ■', 45, 65);
 
-  const drawLbl = (l, x, y) => { ctx.fillStyle = accent; ctx.font = 'bold 13px sans-serif'; ctx.fillText(l, x, y); };
+  // ラベル描画関数（記号付き）
+  const drawLbl = (l, x, y) => { ctx.fillStyle = accent; ctx.font = 'bold 13px sans-serif'; ctx.fillText(`■ ${l} ■`, x, y); };
   
   const name = document.getElementById('name').value || 'Nanashi';
   const rank = document.getElementById('rank').value || '-';
@@ -244,9 +148,11 @@ function generateCard() {
     document.getElementById('tool-socro').checked ? 'socro' : null
   ].filter(t => t).join(' / ') || 'None';
 
-  // 左側：基本情報
+  // アウトプットを白文字に統一
+  ctx.fillStyle = '#fff';
+
   drawLbl('PLAYER NAME', 50, 130);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 44px sans-serif'; ctx.fillText(name, 50, 180);
+  ctx.font = 'bold 44px sans-serif'; ctx.fillText(name, 50, 180);
 
   drawLbl('RANK / RATE', 50, 225);
   ctx.font = 'bold 24px sans-serif'; ctx.fillText(rank, 50, 255);
@@ -254,31 +160,26 @@ function generateCard() {
   drawLbl('MAIN CHARACTER', 50, 300);
   ctx.font = 'bold 20px sans-serif'; ctx.fillText(`${selectedMain} (${selectedColor}P)`, 50, 330);
 
-  // サブキャラ（改行対応で全キャラ選んでも安心）
   drawLbl('SUB CHARACTERS', 50, 375);
-  ctx.font = 'bold 16px sans-serif'; ctx.fillStyle = '#ddd';
+  ctx.font = 'bold 16px sans-serif';
   let subBottomY = drawWrap(ctx, subStr, 50, 405, 380, 24);
 
-  // その他情報（サブキャラ欄の下から開始）
   let nextY = subBottomY + 50;
   drawLbl('STYLE / SIDE / TIME', 50, nextY);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 18px sans-serif'; ctx.fillText(`${style} / ${side} / ${time}`, 50, nextY + 30);
+  ctx.font = 'bold 18px sans-serif'; ctx.fillText(`${style} / ${side} / ${time}`, 50, nextY + 30);
 
-  drawLbl('DEVICE / TOOLS', 50, nextY + 80);
-  ctx.fillText(`${device} [ ${tools} ]`, 50, nextY + 110);
+  drawLbl('DEVICE / TOOLS', 50, nextY + 85);
+  ctx.fillText(`${device} [ ${tools} ]`, 50, nextY + 115);
 
-  // 右側： MATCHUP / OTHER / COMMENT
   drawLbl('MATCHUP', 460, 460);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 16px sans-serif'; ctx.fillText(matchup, 460, 490);
+  ctx.font = 'bold 16px sans-serif'; ctx.fillText(matchup, 460, 490);
 
   drawLbl('OTHER INTERESTS', 460, 535);
-  drawWrap(ctx, other, 460, 560, 290, 22);
+  drawWrap(ctx, other, 460, 565, 290, 22);
 
-  drawLbl('COMMENT', 460, 620);
-  ctx.fillStyle = '#bbb'; ctx.font = 'bold 14px sans-serif';
-  drawWrap(ctx, comment, 460, 645, 290, 20);
+  drawLbl('COMMENT', 460, 625);
+  drawWrap(ctx, comment, 460, 655, 290, 20);
 
-  // 画像描画
   const img = new Image(); const folder = charData[selectedMain];
   img.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
   img.onload = () => {
@@ -288,7 +189,6 @@ function generateCard() {
     document.getElementById('final-image').src = canvas.toDataURL('image/png');
     document.getElementById('final-image').style.display = 'block';
   };
-  img.onerror = () => { ctx.fillStyle = '#222'; ctx.fillRect(460, 90, 290, 340); document.getElementById('final-image').src = canvas.toDataURL(); document.getElementById('final-image').style.display = 'block'; };
 }
 </script>
 </body>
