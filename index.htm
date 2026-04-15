@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - FULL NAME VER</title>
+<title>非想天則 プロフィールメーカー - ADJUSTED VER</title>
 <style>
   :root { 
     --bg-color: #2b1e16; 
@@ -68,14 +68,23 @@
       <div class="form-group"><label>サブキャラ選択</label><div id="sub-char-selector" class="char-grid"></div></div>
 
       <div class="form-group">
-        <label>プレイスタイル / ホスト・クラ</label>
+        <label>プレイスタイル</label>
         <div style="font-size: 0.9em;">
-          <input type="radio" name="style" value="ガチ勢" checked onchange="updatePreview()"> ガチ
+          <input type="radio" name="style" value="ガチ勢" checked onchange="updatePreview()"> ガチ勢
           <input type="radio" name="style" value="エンジョイ" onchange="updatePreview()"> エンジョイ
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ホスト / クライアント設定</label>
+        <div style="font-size: 0.9em;">
+          ホスト：
+          <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可
+          <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
           <span style="margin: 0 10px;">|</span>
-          <input type="radio" name="side" value="ホスト派" checked onchange="updatePreview()"> ホスト
-          <input type="radio" name="side" value="クラ派" onchange="updatePreview()"> クラ
-          <input type="radio" name="side" value="両方可" onchange="updatePreview()"> 両方
+          クラ：
+          <input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可
+          <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
         </div>
       </div>
 
@@ -92,13 +101,12 @@
     </form>
 
     <div id="output-area">
-      <canvas id="card-canvas" width="800" height="850"></canvas>
+      <canvas id="card-canvas" width="800" height="900"></canvas>
       <img id="final-image" alt="Profile Card">
     </div>
   </div>
 
 <script>
-// フルネームに修正
 const charFullNames = [
   "博麗霊夢", "霧雨魔理沙", "十六夜咲夜", "アリス・マーガトロイド", 
   "パチュリー・ノーレッジ", "魂魄妖夢", "レミリア・スカーレット", 
@@ -107,7 +115,6 @@ const charFullNames = [
   "東風谷早苗", "チルノ", "紅美鈴", "霊烏路空", "洩矢諏訪子"
 ];
 
-// 画像パス用の内部ID（短縮名のまま）
 const charIdMap = {
   "博麗霊夢":"reimu","霧雨魔理沙":"marisa","十六夜咲夜":"sakuya",
   "アリス・マーガトロイド":"alice","パチュリー・ノーレッジ":"patche",
@@ -173,13 +180,13 @@ function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
 
 function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
-  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 850);
+  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 900);
   
-  // 網掛け装飾
-  ctx.fillStyle = 'rgba(218, 165, 32, 0.03)';
-  for(let i=0; i<800; i+=5) { for(let j=0; j<850; j+=5) { ctx.fillRect(i, j, 1, 1); } }
+  // 網掛け装飾を強調
+  ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
+  for(let i=0; i<800; i+=4) { for(let j=0; j<900; j+=4) { ctx.fillRect(i, j, 1, 1); } }
 
-  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 810);
+  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 860);
   ctx.fillStyle = brass; ctx.font = 'bold 24px serif'; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
 
   const drawLbl = (l, x, y) => { ctx.fillStyle = brass; ctx.font = 'bold 13px serif'; ctx.fillText(`【 ${l} 】`, x, y); };
@@ -188,7 +195,8 @@ function updatePreview() {
   const name = document.getElementById('name').value;
   const rank = document.getElementById('rank').value;
   const style = document.querySelector('input[name="style"]:checked').value;
-  const side = document.querySelector('input[name="side"]:checked').value;
+  const hostStatus = document.querySelector('input[name="host"]:checked').value;
+  const clientStatus = document.querySelector('input[name="client"]:checked').value;
   const time = document.getElementById('time').value;
   const device = document.getElementById('device').value;
   const matchup = document.getElementById('matchup').value;
@@ -204,15 +212,17 @@ function updatePreview() {
   let subY = drawWrap(ctx, selectedSubs.join(', ') || '---', 55, 415, 380, 22);
   
   let nextY = subY + 50;
-  drawLbl('STYLE / SIDE / TIME', 55, nextY); drawDat(`${style} / ${side} / ${time}`, 55, nextY + 30, 'bold 18px serif');
-  drawLbl('DEVICE', 55, nextY + 85); drawDat(device, 55, nextY + 115, 'bold 17px serif');
+  drawLbl('STYLE / TIME', 55, nextY); drawDat(`${style} / ${time}`, 55, nextY + 30, 'bold 18px serif');
+  drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hostStatus} / クラ: ${clientStatus}`, 55, nextY + 115, 'bold 18px serif');
+  drawLbl('DEVICE', 55, nextY + 170); drawDat(device, 55, nextY + 200, 'bold 17px serif');
 
+  // 画像ファイルのピクセルを無調整で描画
   if(charImage.complete && charImage.naturalWidth !== 0) {
-    ctx.drawImage(charImage, 460, 90, 280, 320);
-    ctx.strokeStyle = brass; ctx.strokeRect(458, 88, 284, 324);
+    ctx.drawImage(charImage, 460, 90);
+    ctx.strokeStyle = brass; ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
   }
   
-  let rightY = 460;
+  let rightY = 460 + (charImage.height > 320 ? charImage.height - 320 : 0);
   drawLbl('MATCHUP', 460, rightY); drawDat(matchup, 460, rightY + 30, 'bold 16px serif');
   drawLbl('OTHER INTERESTS', 460, rightY + 75); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   let otherY = drawWrap(ctx, other || '---', 460, rightY + 105, 290, 22);
