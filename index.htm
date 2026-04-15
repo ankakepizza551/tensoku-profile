@@ -17,6 +17,19 @@
     margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
   }
   .container { width: 100%; max-width: var(--card-width); display: flex; flex-direction: column; gap: 20px; }
+  
+  /* タイトル部分のカスタマイズ */
+  .main-title {
+    text-align: center;
+    color: var(--accent-color);
+    line-height: 1.2;
+    margin: 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .main-title .line-1 { font-size: 1.8rem; display: block; }
+  .main-title .line-2 { font-size: 1.4rem; display: block; margin-top: 5px; }
+
   #profile-form { 
     background-color: var(--bg-color); padding: 20px; border: 3px double var(--accent-color); 
     box-sizing: border-box; 
@@ -49,7 +62,10 @@
 </head>
 <body>
 
-  <h1 style="color:var(--accent-color)">⚙ HISOUTENSOKU PROFILE GENERATOR ⚙</h1>
+  <div class="main-title">
+    <span class="line-1">⚙ HISOUTENSOKU</span>
+    <span class="line-2">PROFILE GENERATOR ⚙</span>
+  </div>
 
   <div class="container">
     <form id="profile-form">
@@ -91,6 +107,7 @@
   </div>
 
 <script>
+// キャラクター順序（前回のご指定通り）
 const charData = {
   "博麗 霊夢":"reimu","霧雨 魔理沙":"marisa","十六夜 咲夜":"sakuya",
   "アリス・マーガトロイド":"alice","パチュリー・ノーレッジ":"patche",
@@ -115,7 +132,6 @@ window.onload = () => {
       mb.classList.add('selected'); selectedMain=name; loadCharImage();
     };
     mS.appendChild(mb);
-
     const sb = document.createElement('div'); sb.className='char-btn'; sb.innerHTML=`<span>${displayName}</span>`;
     sb.onclick=()=>{
       if(selectedSubs.includes(name)){selectedSubs=selectedSubs.filter(n=>n!==name); sb.classList.remove('selected');}
@@ -125,7 +141,7 @@ window.onload = () => {
     sS.appendChild(sb);
   });
   updateColorSelector();
-  loadCharImage(); // 初期画像読み込み
+  loadCharImage();
 };
 
 function updateColorSelector() {
@@ -197,7 +213,7 @@ function updatePreview() {
     ctx.strokeRect(imgX - 2, imgY - 2, charImage.width + 4, charImage.height + 4);
     var nextRightY = imgY + charImage.height + 40;
   } else {
-    var nextRightY = imgY + 340 + 40; // 画像がない場合の予備高さ
+    var nextRightY = imgY + 340 + 40;
   }
 
   drawLbl('MATCHUP', 460, nextRightY);
