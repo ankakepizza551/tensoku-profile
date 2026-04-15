@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - FULL STEAMPUNK</title>
+<title>非想天則 プロフィールメーカー - FULL NAME VER</title>
 <style>
   :root { 
     --bg-color: #2b1e16; 
@@ -30,13 +30,13 @@
     color: #fff; box-sizing: border-box; font-size: 16px;
   }
 
-  /* キャラクターグリッド */
-  .char-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 10px; }
+  .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
   .char-btn { 
-    cursor: pointer; border: 1px solid var(--border-color); aspect-ratio: 1/1; background: #3e2723; 
-    display: flex; align-items: center; justify-content: center; font-size: 9px; text-align: center;
+    cursor: pointer; border: 1px solid var(--border-color); height: 40px; background: #3e2723; 
+    display: flex; align-items: center; justify-content: center; font-size: 10px; text-align: center; line-height: 1.1;
+    padding: 2px;
   }
-  .char-btn.selected { border: 2px solid var(--accent-color); background: #5d4037; }
+  .char-btn.selected { border: 2px solid var(--accent-color); background: #5d4037; color: #fff; }
   
   .btn-group { display: flex; gap: 10px; margin-top: 20px; }
   #generate-btn { flex: 1; padding: 15px; background: var(--accent-color); font-weight: bold; cursor: pointer; border: none; }
@@ -62,7 +62,7 @@
       <div class="form-group">
         <label>メインキャラ / カラー選択</label>
         <div id="main-char-selector" class="char-grid"></div>
-        <div id="color-selector" style="display:flex; gap:5px; flex-wrap: wrap;"></div>
+        <div id="color-selector" style="display:flex; gap:5px; flex-wrap: wrap; margin-top: 5px;"></div>
       </div>
 
       <div class="form-group"><label>サブキャラ選択</label><div id="sub-char-selector" class="char-grid"></div></div>
@@ -92,29 +92,38 @@
     </form>
 
     <div id="output-area">
-      <canvas id="card-canvas" width="800" height="800"></canvas>
+      <canvas id="card-canvas" width="800" height="850"></canvas>
       <img id="final-image" alt="Profile Card">
     </div>
   </div>
 
 <script>
-const charData = {
-  "博麗 霊夢":"reimu","霧雨 魔理沙":"marisa","十六夜 咲夜":"sakuya",
-  "アリス":"alice","パチュリー":"patche","魂魄 妖夢":"youmu",
-  "レミリア":"remilia","西行寺 幽々子":"yuyuko","八雲 紫":"yukari",
-  "伊吹 萃香":"suika","鈴仙":"reisen","射命丸 文":"aya",
-  "小野塚 小町":"komachi","永江 衣玖":"iku","比那名居 天子":"tenshi",
-  "東風谷 早苗":"sanae","チルノ":"cirno","紅 美鈴":"meirin",
-  "霊烏路 空":"utsuho","洩矢 諏訪子":"suwako"
+// フルネームに修正
+const charFullNames = [
+  "博麗霊夢", "霧雨魔理沙", "十六夜咲夜", "アリス・マーガトロイド", 
+  "パチュリー・ノーレッジ", "魂魄妖夢", "レミリア・スカーレット", 
+  "西行寺幽々子", "八雲紫", "伊吹萃香", "鈴仙・優曇華院・イナバ", 
+  "射命丸文", "小野塚小町", "永江衣玖", "比那名居天子", 
+  "東風谷早苗", "チルノ", "紅美鈴", "霊烏路空", "洩矢諏訪子"
+];
+
+// 画像パス用の内部ID（短縮名のまま）
+const charIdMap = {
+  "博麗霊夢":"reimu","霧雨魔理沙":"marisa","十六夜咲夜":"sakuya",
+  "アリス・マーガトロイド":"alice","パチュリー・ノーレッジ":"patche",
+  "魂魄妖夢":"youmu","レミリア・スカーレット":"remilia",
+  "西行寺幽々子":"yuyuko","八雲紫":"yukari","伊吹萃香":"suika",
+  "鈴仙・優曇華院・イナバ":"reisen","射命丸文":"aya","小野塚小町":"komachi",
+  "永江衣玖":"iku","比那名居天子":"tenshi","東風谷早苗":"sanae",
+  "チルノ":"cirno","紅美鈴":"meirin","霊烏路空":"utsuho","洩矢諏訪子":"suwako"
 };
 
-let selectedMain = "博麗 霊夢", selectedSubs = [], selectedColor = "1";
+let selectedMain = "博麗霊夢", selectedSubs = [], selectedColor = "1";
 let charImage = new Image();
 
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
-  Object.keys(charData).forEach(name => {
-    // メイン選択用
+  charFullNames.forEach(name => {
     const mb = document.createElement('div'); mb.className='char-btn'; mb.innerText=name;
     if(name===selectedMain) mb.classList.add('selected');
     mb.onclick=()=>{
@@ -122,7 +131,7 @@ window.onload = () => {
       mb.classList.add('selected'); selectedMain=name; loadCharImage();
     };
     mS.appendChild(mb);
-    // サブ選択用
+    
     const sb = document.createElement('div'); sb.className='char-btn'; sb.innerText=name;
     sb.onclick=()=>{
       if(selectedSubs.includes(name)){selectedSubs=selectedSubs.filter(n=>n!==name); sb.classList.remove('selected');}
@@ -145,7 +154,7 @@ function updateColorSelector() {
 }
 
 function loadCharImage() {
-  const folder = charData[selectedMain];
+  const folder = charIdMap[selectedMain];
   charImage.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
   charImage.onload = () => updatePreview();
   charImage.onerror = () => updatePreview();
@@ -164,13 +173,13 @@ function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
 
 function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
-  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 800);
+  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 850);
   
   // 網掛け装飾
   ctx.fillStyle = 'rgba(218, 165, 32, 0.03)';
-  for(let i=0; i<800; i+=5) { for(let j=0; j<800; j+=5) { ctx.fillRect(i, j, 1, 1); } }
+  for(let i=0; i<800; i+=5) { for(let j=0; j<850; j+=5) { ctx.fillRect(i, j, 1, 1); } }
 
-  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 760);
+  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 810);
   ctx.fillStyle = brass; ctx.font = 'bold 24px serif'; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
 
   const drawLbl = (l, x, y) => { ctx.fillStyle = brass; ctx.font = 'bold 13px serif'; ctx.fillText(`【 ${l} 】`, x, y); };
@@ -189,14 +198,15 @@ function updatePreview() {
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
   drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
   drawLbl('MAIN CHARACTER', 55, 305); drawDat(`${selectedMain} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
-  drawLbl('SUB CHARACTERS', 55, 385); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 16px serif';
-  let subY = drawWrap(ctx, selectedSubs.join(', ') || '---', 55, 415, 380, 24);
+  
+  drawLbl('SUB CHARACTERS', 55, 385); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  let subY = drawWrap(ctx, selectedSubs.join(', ') || '---', 55, 415, 380, 22);
   
   let nextY = subY + 50;
   drawLbl('STYLE / SIDE / TIME', 55, nextY); drawDat(`${style} / ${side} / ${time}`, 55, nextY + 30, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 85); drawDat(device, 55, nextY + 115, 'bold 17px serif');
 
-  // 右列
   if(charImage.complete && charImage.naturalWidth !== 0) {
     ctx.drawImage(charImage, 460, 90, 280, 320);
     ctx.strokeStyle = brass; ctx.strokeRect(458, 88, 284, 324);
