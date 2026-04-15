@@ -18,17 +18,19 @@
   }
   .container { width: 100%; max-width: var(--card-width); display: flex; flex-direction: column; gap: 20px; }
   
-  /* タイトル部分のカスタマイズ */
+  /* タイトル部分のカスタマイズ：2段構成＆両端に歯車 */
   .main-title {
     text-align: center;
     color: var(--accent-color);
-    line-height: 1.2;
+    line-height: 1.3;
     margin: 20px 0;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    font-weight: bold;
   }
-  .main-title .line-1 { font-size: 1.8rem; display: block; }
-  .main-title .line-2 { font-size: 1.4rem; display: block; margin-top: 5px; }
+  .main-title .line { display: block; white-space: nowrap; }
+  .main-title .line-1 { font-size: 1.6rem; }
+  .main-title .line-2 { font-size: 1.3rem; margin-top: 5px; }
 
   #profile-form { 
     background-color: var(--bg-color); padding: 20px; border: 3px double var(--accent-color); 
@@ -63,8 +65,8 @@
 <body>
 
   <div class="main-title">
-    <span class="line-1">⚙ HISOUTENSOKU</span>
-    <span class="line-2">PROFILE GENERATOR ⚙</span>
+    <span class="line line-1">⚙ HISOUTENSOKU ⚙</span>
+    <span class="line line-2">⚙ PROFILE GENERATOR ⚙</span>
   </div>
 
   <div class="container">
@@ -107,7 +109,6 @@
   </div>
 
 <script>
-// キャラクター順序（前回のご指定通り）
 const charData = {
   "博麗 霊夢":"reimu","霧雨 魔理沙":"marisa","十六夜 咲夜":"sakuya",
   "アリス・マーガトロイド":"alice","パチュリー・ノーレッジ":"patche",
