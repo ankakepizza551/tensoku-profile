@@ -45,11 +45,16 @@
       <div class="form-group"><label>サブキャラ選択</label><div id="sub-char-selector" class="char-grid"></div></div>
 
       <div class="form-group">
-        <label>プレイスタイル / ホスト・クラ</label>
+        <label>プレイスタイル</label>
         <div class="selection-stack">
           <label><input type="radio" name="style" value="ガチ勢" checked> ガチ勢</label>
           <label><input type="radio" name="style" value="エンジョイ"> エンジョイ</label>
-          <hr style="width:100%; border:0; border-top:1px solid #444;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ホスト / クラ設定</label>
+        <div class="selection-stack">
           <label><input type="radio" name="side" value="ホスト派" checked> ホスト派</label>
           <label><input type="radio" name="side" value="クラ派"> クラ派</label>
           <label><input type="radio" name="side" value="両方可"> 両方可</label>
@@ -128,8 +133,10 @@ function generateCard() {
   
   ctx.fillStyle = accent; ctx.font = 'bold 24px sans-serif'; ctx.fillText('■ HISOUTENSOKU PLAYER PROFILE ■', 45, 65);
 
-  // ラベル描画関数（記号付き）
+  // 描画ヘルパー：項目ラベル用（緑）
   const drawLbl = (l, x, y) => { ctx.fillStyle = accent; ctx.font = 'bold 13px sans-serif'; ctx.fillText(`■ ${l} ■`, x, y); };
+  // 描画ヘルパー：入力データ用（白）
+  const drawDat = (d, x, y, f) => { ctx.fillStyle = '#ffffff'; ctx.font = f; ctx.fillText(d, x, y); };
   
   const name = document.getElementById('name').value || 'Nanashi';
   const rank = document.getElementById('rank').value || '-';
@@ -148,38 +155,40 @@ function generateCard() {
     document.getElementById('tool-socro').checked ? 'socro' : null
   ].filter(t => t).join(' / ') || 'None';
 
-  // アウトプットを白文字に統一
-  ctx.fillStyle = '#fff';
-
+  // --- 左側エリア ---
   drawLbl('PLAYER NAME', 50, 130);
-  ctx.font = 'bold 44px sans-serif'; ctx.fillText(name, 50, 180);
+  drawDat(name, 50, 180, 'bold 44px sans-serif');
 
   drawLbl('RANK / RATE', 50, 225);
-  ctx.font = 'bold 24px sans-serif'; ctx.fillText(rank, 50, 255);
+  drawDat(rank, 50, 255, 'bold 24px sans-serif');
 
   drawLbl('MAIN CHARACTER', 50, 300);
-  ctx.font = 'bold 20px sans-serif'; ctx.fillText(`${selectedMain} (${selectedColor}P)`, 50, 330);
+  drawDat(`${selectedMain} (${selectedColor}P)`, 50, 330, 'bold 20px sans-serif');
 
   drawLbl('SUB CHARACTERS', 50, 375);
-  ctx.font = 'bold 16px sans-serif';
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 16px sans-serif';
   let subBottomY = drawWrap(ctx, subStr, 50, 405, 380, 24);
 
   let nextY = subBottomY + 50;
   drawLbl('STYLE / SIDE / TIME', 50, nextY);
-  ctx.font = 'bold 18px sans-serif'; ctx.fillText(`${style} / ${side} / ${time}`, 50, nextY + 30);
+  drawDat(`${style} / ${side} / ${time}`, 50, nextY + 30, 'bold 18px sans-serif');
 
   drawLbl('DEVICE / TOOLS', 50, nextY + 85);
-  ctx.fillText(`${device} [ ${tools} ]`, 50, nextY + 115);
+  drawDat(`${device} [ ${tools} ]`, 50, nextY + 115, 'bold 17px sans-serif');
 
+  // --- 右側エリア ---
   drawLbl('MATCHUP', 460, 460);
-  ctx.font = 'bold 16px sans-serif'; ctx.fillText(matchup, 460, 490);
+  drawDat(matchup, 460, 490, 'bold 16px sans-serif');
 
   drawLbl('OTHER INTERESTS', 460, 535);
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 15px sans-serif';
   drawWrap(ctx, other, 460, 565, 290, 22);
 
   drawLbl('COMMENT', 460, 625);
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 14px sans-serif';
   drawWrap(ctx, comment, 460, 655, 290, 20);
 
+  // キャラ画像
   const img = new Image(); const folder = charData[selectedMain];
   img.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
   img.onload = () => {
