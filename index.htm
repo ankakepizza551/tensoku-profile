@@ -25,7 +25,6 @@
     margin: 30px 0; 
     font-family: 'Oswald', sans-serif; 
     color: var(--accent-color);
-    /* 立体感を消してフラットに */
     text-shadow: none;
   }
 
@@ -77,7 +76,6 @@
   }
   .color-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
 
-  /* 通信設定を2行にするためのスタイル */
   .connection-row {
     display: flex;
     flex-direction: column;
@@ -138,7 +136,7 @@
             ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
           </div>
           <div>
-            クラ：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
+            クライアント：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
           </div>
         </div>
       </div>
@@ -322,7 +320,8 @@ function updatePreview() {
   
   let nextY = subY + 40;
   drawLbl('STYLE / TIME', 55, nextY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, nextY + 30, 'bold 18px serif');
-  drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`HOST: ${hS} / CLIENT: ${cS}`, 55, nextY + 115, 'bold 18px serif');
+  // 「クラ」を「クライアント」に修正
+  drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
   if (selectedMain.id === "random") {
