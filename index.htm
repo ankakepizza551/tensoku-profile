@@ -1,7 +1,4 @@
-import os
-
-# Define the HTML content with integrated CSS and JS
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -12,96 +9,80 @@ html_content = """<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --card-bg: #0d0d0d;
+            --bg-color: #121212;
+            --card-bg: #000000;
             --accent-gold: #d4af37;
             --text-white: #ffffff;
         }
 
         body {
-            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            font-family: sans-serif;
             background-color: var(--bg-color);
             color: var(--text-white);
             margin: 0;
+            padding: 10px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
         }
 
         .container {
-            display: flex;
-            gap: 30px;
-            max-width: 1000px;
             width: 100%;
-            background: #262626;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 500px; /* スマホで見やすい幅に固定 */
+            display: flex;
+            flex-direction: column; /* 縦並びに変更 */
+            gap: 20px;
         }
 
-        /* 左側：入力エリア */
         .input-section {
-            flex: 1;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
         .input-section h2 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            margin-top: 0;
             border-left: 4px solid var(--accent-gold);
             padding-left: 10px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+        .form-group { margin-bottom: 15px; }
 
-        label {
-            display: block;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            color: #ccc;
-        }
+        label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: #aaa; }
 
         input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #444;
             background: #111;
             color: #fff;
-            border-radius: 4px;
-            font-size: 1rem;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
 
-        /* 右側：プレビューエリア */
+        /* プレビューエリアの修正 */
         .preview-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
         }
 
         .preview-card {
             width: 100%;
-            aspect-ratio: 16 / 9;
+            min-height: 200px;
             background: var(--card-bg);
             border: 2px solid var(--accent-gold);
             padding: 20px;
-            position: relative;
-            overflow: hidden;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
-            box-sizing: border-box;
+            justify-content: center;
+            gap: 15px;
         }
 
-        /* プレビュー内のテキスト設定 */
         .p-label {
             font-family: 'Oswald', sans-serif;
             color: var(--accent-gold);
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             margin: 0;
         }
@@ -109,33 +90,24 @@ html_content = """<!DOCTYPE html>
         #p-name {
             font-family: 'Noto Serif JP', serif;
             font-weight: 900;
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin: 0;
-            letter-spacing: 0.1em;
-            text-shadow: 2px 2px 0px #000, -1px -1px 0px #000;
+            letter-spacing: 0.05em;
         }
 
         #p-rank {
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin: 0;
-            color: #fff;
         }
 
         #p-comment {
             font-family: 'Noto Serif JP', serif;
-            font-weight: 700;
-            font-size: 1.1rem;
-            font-style: italic;
+            font-size: 0.9rem;
             border-top: 1px solid #333;
             padding-top: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
+            margin: 0;
         }
     </style>
 </head>
@@ -145,12 +117,12 @@ html_content = """<!DOCTYPE html>
     <div class="input-section">
         <h2>設定入力</h2>
         <div class="form-group">
-            <label>キャラクター名 / プレイヤー名</label>
+            <label>キャラクター名</label>
             <input type="text" id="in-name" placeholder="博麗 霊夢" oninput="update()">
         </div>
         <div class="form-group">
-            <label>ランク / 段位 (英数字)</label>
-            <input type="text" id="in-rank" placeholder="Lunatic / 1000" oninput="update()">
+            <label>ランク (英数字)</label>
+            <input type="text" id="in-rank" placeholder="LUNATIC" oninput="update()">
         </div>
         <div class="form-group">
             <label>一言コメント</label>
@@ -159,7 +131,7 @@ html_content = """<!DOCTYPE html>
     </div>
 
     <div class="preview-section">
-        <div class="preview-card" id="capture-area">
+        <div class="preview-card">
             <div>
                 <p class="p-label">Player Name</p>
                 <h1 id="p-name">博麗 霊夢</h1>
@@ -172,26 +144,16 @@ html_content = """<!DOCTYPE html>
                 <p id="p-comment">空を飛ぶ程度の能力</p>
             </div>
         </div>
-        <p style="margin-top: 15px; font-size: 0.8rem; color: #888;">※プレビューには天則風のフォントが適用されています</p>
     </div>
 </div>
 
 <script>
     function update() {
-        // 入力値を取得
-        const name = document.getElementById('in-name').value || '博麗 霊夢';
-        const rank = document.getElementById('in-rank').value || 'LUNATIC';
-        const comment = document.getElementById('in-comment').value || '空を飛ぶ程度の能力';
-
-        // プレビューに反映
-        document.getElementById('p-name').innerText = name;
-        document.getElementById('p-rank').innerText = rank;
-        document.getElementById('p-comment').innerText = comment;
+        document.getElementById('p-name').innerText = document.getElementById('in-name').value || '博麗 霊夢';
+        document.getElementById('p-rank').innerText = (document.getElementById('in-rank').value || 'LUNATIC').toUpperCase();
+        document.getElementById('p-comment').innerText = document.getElementById('in-comment').value || '空を飛ぶ程度の能力';
     }
 </script>
 
 </body>
-</html>"""
-
-with open("th123_generator.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
+</html>
