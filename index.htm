@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - IMAGE SELECT VER</title>
+<title>非想天則 プロフィールメーカー - 3D TITLE VER</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -20,7 +20,27 @@
   }
   .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
   
-  .main-title { text-align: center; color: var(--accent-color); margin: 20px 0; font-family: 'Oswald', sans-serif; }
+  /* タイトルを立体的に装飾 */
+  .main-title { 
+    text-align: center; 
+    margin: 30px 0; 
+    font-family: 'Oswald', sans-serif; 
+    color: var(--accent-color);
+    /* 複数の影をずらして重ねることで厚み（立体感）を出す */
+    text-shadow: 
+      0 1px 0 #b18d1a, 
+      0 2px 0 #a17d1a, 
+      0 3px 0 #815d1a, 
+      0 4px 0 #714d1a, 
+      0 5px 0 #613d1a, 
+      0 6px 1px rgba(0,0,0,.1), 
+      0 0 5px rgba(0,0,0,.1), 
+      0 1px 3px rgba(0,0,0,.3), 
+      0 3px 5px rgba(0,0,0,.2), 
+      0 5px 10px rgba(0,0,0,.25), 
+      0 10px 10px rgba(0,0,0,.2), 
+      0 20px 20px rgba(0,0,0,.15);
+  }
 
   #profile-form { background-color: var(--bg-color); padding: 25px; border: 3px double var(--accent-color); }
   .form-group { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
@@ -30,7 +50,6 @@
     width: 100%; padding: 10px; background: #1a0f0a; border: 1px solid var(--border-color); color: #fff; box-sizing: border-box; font-size: 16px;
   }
 
-  /* キャラクター選択グリッド（最初のHTMLのスタイル） */
   .char-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
   .char-btn { 
     cursor: pointer; border: 2px solid var(--border-color); background: #3e2723; 
@@ -55,8 +74,8 @@
 <body>
 
   <div class="main-title">
-    <div style="font-size: 2rem; font-weight: 700;">⚙ HISOUTENSOKU ⚙</div>
-    <div style="font-size: 1rem; letter-spacing: 4px;">PROFILE GENERATOR</div>
+    <div style="font-size: 2.8rem; font-weight: 700;">⚙ HISOUTENSOKU ⚙</div>
+    <div style="font-size: 1.4rem; letter-spacing: 6px; margin-top: 5px;">PROFILE GENERATOR</div>
   </div>
 
   <div class="container">
@@ -107,6 +126,7 @@
   </div>
 
 <script>
+// 画像パスとキャラクターリストの設定
 const pngPath = "./image/ProfileSelectPNG/";
 const charList = [
   { name: "博麗霊夢", id: "reimu", file: "Select_01Reimu.png" },
@@ -181,7 +201,7 @@ function updateColorSelector() {
 }
 
 function loadCharImage() {
-  // メイン画像のパス生成（folder/folder-Np.jpg）
+  // メイン画像の読み込み
   charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.jpg`;
   charImage.onload = () => updatePreview();
   charImage.onerror = () => { charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.jpg`; };
@@ -202,7 +222,7 @@ function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
   ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 900);
   
-  // 背景装飾
+  // 背景装飾（ドット網掛け）
   ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
   for(let i=0; i<800; i+=4) { for(let j=0; j<900; j+=4) { ctx.fillRect(i, j, 1, 1); } }
   ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 860);
@@ -216,7 +236,12 @@ function updatePreview() {
   const hS = document.querySelector('input[name="host"]:checked').value;
   const cS = document.querySelector('input[name="client"]:checked').value;
 
-  drawDat('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75, 'bold 24px Oswald');
+  // キャンバス上のタイトル（少し太めのアウトライン付き）
+  ctx.font = 'bold 24px Oswald';
+  ctx.lineWidth = 5; ctx.strokeStyle = '#000';
+  ctx.strokeText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
+  ctx.fillStyle = brass; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
+
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
   drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
   drawLbl('MAIN CHARACTER', 55, 305); drawDat(`${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
