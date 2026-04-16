@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - 統一フォント版</title>
+<title>非想天則 プロフィールメーカー - ブラッシュアップ版</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -15,7 +15,6 @@
     --border-color: #5d4037; 
   }
   body { 
-    /* 入力画面は読みやすさ優先の標準フォント */
     font-family: sans-serif; 
     background-color: #1a0f0a; 
     color: var(--text-color); 
@@ -23,7 +22,6 @@
   }
   .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
   
-  /* タイトル部分のみ世界観に合わせる */
   .main-title { 
     text-align: center; color: var(--accent-color); margin: 20px 0; 
     font-family: 'Oswald', sans-serif; letter-spacing: 4px; 
@@ -117,7 +115,6 @@
   </div>
 
 <script>
-// キャラクター名のリスト
 const charFullNames = [
   "博麗霊夢", "霧雨魔理沙", "十六夜咲夜", "アリス・マーガトロイド", 
   "パチュリー・ノーレッジ", "魂魄妖夢", "レミリア・スカーレット", 
@@ -183,46 +180,54 @@ function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
   for (let n = 0; n < text.length; n++) {
     let testLine = line + text[n];
     if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-      ctx.fillText(line, x, y); line = text[n]; y += lineHeight;
-    } else { line = text[n] === '\\n' ? line : testLine; }
+      ctx.strokeText(line, x, y); ctx.fillText(line, x, y); line = text[n]; y += lineHeight;
+    } else { line = testLine; }
   }
-  ctx.fillText(line, x, y); return y;
+  ctx.strokeText(line, x, y); ctx.fillText(line, x, y); return y;
 }
 
 function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
   
-  // 背景描画
   ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 900);
   ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
   for(let i=0; i<800; i+=4) { for(let j=0; j<900; j+=4) { ctx.fillRect(i, j, 1, 1); } }
   ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 860);
 
-  // タイトル（英数字用フォント）
-  ctx.fillStyle = brass; ctx.font = 'bold 28px "Oswald"'; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
+  // 文字描画の設定（縁取り用）
+  ctx.lineJoin = "round";
+  ctx.miterLimit = 2;
 
-  const drawLbl = (l, x, y) => { ctx.fillStyle = brass; ctx.font = 'bold 15px "Oswald"'; ctx.fillText(l, x, y); };
+  const drawTextWithOutline = (text, x, y, font, fillStyle, outlineWidth = 4) => {
+    ctx.font = font;
+    ctx.lineWidth = outlineWidth;
+    ctx.strokeStyle = '#000000';
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = fillStyle;
+    ctx.fillText(text, x, y);
+  };
+
+  const drawLbl = (l, x, y) => { drawTextWithOutline(l, x, y, 'bold 15px "Oswald"', brass, 3); };
   
-  // プレイヤー名とランク（重厚な明朝体）
   const name = document.getElementById('name').value || 'プレイヤー未設定';
   const rank = document.getElementById('rank').value || 'RANK UNKNOWN';
   
+  drawTextWithOutline('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75, 'bold 28px "Oswald"', brass, 5);
+
   drawLbl('PLAYER NAME', 55, 130);
-  ctx.fillStyle = '#fdf5e6'; ctx.font = '900 50px "Noto Serif JP"'; 
-  ctx.fillText(name, 55, 185);
+  drawTextWithOutline(name, 55, 185, '900 50px "Noto Serif JP"', '#fdf5e6', 6);
 
   drawLbl('RANK / RATE', 55, 230);
-  ctx.font = '700 30px "Oswald"'; ctx.fillText(rank, 55, 265);
+  drawTextWithOutline(rank, 55, 265, '700 30px "Oswald"', '#fdf5e6', 4);
 
-  // キャラクター情報
   drawLbl('MAIN CHARACTER', 55, 315);
-  ctx.font = '700 22px "Noto Serif JP"'; ctx.fillText(`${selectedMain} (${selectedColor}P)`, 55, 345);
+  drawTextWithOutline(`${selectedMain} (${selectedColor}P)`, 55, 345, '700 22px "Noto Serif JP"', '#fdf5e6', 4);
   
   drawLbl('SUB CHARACTERS', 55, 395); 
   ctx.font = '700 16px "Noto Serif JP"';
+  ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
   let subY = drawWrap(ctx, selectedSubs.join(' / ') || 'なし', 55, 425, 380, 24);
   
-  // その他ステータス
   const style = document.querySelector('input[name="style"]:checked').value;
   const time = document.getElementById('time').value || '未設定';
   const host = document.querySelector('input[name="host"]:checked').value;
@@ -234,26 +239,31 @@ function updatePreview() {
 
   let nextY = subY + 55;
   drawLbl('STYLE / TIME', 55, nextY);
-  ctx.font = '700 18px "Noto Serif JP"'; ctx.fillText(`${style} / ${time}`, 55, nextY + 30);
+  drawTextWithOutline(`${style} / ${time}`, 55, nextY + 30, '700 18px "Noto Serif JP"', '#fdf5e6', 3);
 
   drawLbl('HOST / CLIENT', 55, nextY + 85);
-  ctx.fillText(`ホスト: ${host} / クライアント: ${client}`, 55, nextY + 115);
+  drawTextWithOutline(`ホスト: ${host} / クライアント: ${client}`, 55, nextY + 115, '700 18px "Noto Serif JP"', '#fdf5e6', 3);
 
   drawLbl('INPUT DEVICE', 55, nextY + 170);
-  ctx.fillText(device, 55, nextY + 200);
+  drawTextWithOutline(device, 55, nextY + 200, '700 18px "Noto Serif JP"', '#fdf5e6', 3);
 
-  // キャラクター画像
+  // キャラクター画像（シャドウと一体感の追加）
   if(charImage.complete && charImage.naturalWidth !== 0) {
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.8)";
+    ctx.shadowBlur = 15;
     ctx.drawImage(charImage, 460, 90);
-    ctx.strokeStyle = brass; ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
+    ctx.restore();
+    ctx.strokeStyle = brass; ctx.lineWidth = 3; ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
   }
   
-  // 右側項目
   let rightY = 460;
   drawLbl('MATCHUP (GOOD/BAD)', 460, rightY);
-  ctx.font = '700 16px "Noto Serif JP"'; ctx.fillText(matchup, 460, rightY + 30);
+  drawTextWithOutline(matchup, 460, rightY + 30, '700 16px "Noto Serif JP"', '#fdf5e6', 3);
 
   drawLbl('OTHER INTERESTS', 460, rightY + 75);
+  ctx.font = '700 16px "Noto Serif JP"';
+  ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
   let otherY = drawWrap(ctx, other, 460, rightY + 105, 290, 22);
 
   drawLbl('MESSAGE', 460, otherY + 45);
