@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - カスタム版</title>
+<title>非想天則 プロフィールメーカー - 最終調整版</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -44,13 +44,40 @@
     cursor: pointer; border: 2px solid var(--border-color); background: #3e2723; 
     position: relative; aspect-ratio: 1 / 1; overflow: hidden; transition: 0.1s;
   }
+  
+  /* ランダムボタンを横いっぱいに広げる */
+  .random-btn-wide { 
+    grid-column: span 5; 
+    aspect-ratio: auto; 
+    height: 50px; 
+    margin-top: 5px; 
+  }
+  
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .char-btn:hover { transform: scale(1.05); }
+  .char-btn:hover { transform: scale(1.02); }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
   .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
 
-  .color-btn { padding: 8px 12px; background: #3e2723; border: 1px solid var(--border-color); color: #fff; cursor: pointer; }
+  /* 1P-8Pボタンを1行に収める設定 */
+  .color-container { 
+    display: flex; 
+    flex-wrap: nowrap; 
+    gap: 2px; 
+    margin-top: 10px; 
+    width: 100%; 
+  }
+  .color-btn { 
+    flex: 1; 
+    padding: 8px 0; 
+    background: #3e2723; 
+    border: 1px solid var(--border-color); 
+    color: #fff; 
+    cursor: pointer; 
+    font-size: 12px; /* 少し小さくして確実に収める */
+    text-align: center;
+    min-width: 0;
+  }
   .color-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
 
   .btn-group { display: flex; gap: 10px; margin-top: 20px; }
@@ -83,7 +110,7 @@
       <div class="form-group">
         <label>メインキャラ / カラー選択</label>
         <div id="main-char-selector" class="char-grid"></div>
-        <div id="color-selector" style="display:flex; gap:5px; flex-wrap: wrap; margin-top: 10px;"></div>
+        <div id="color-selector" class="color-container"></div>
       </div>
 
       <div class="form-group">
@@ -96,7 +123,7 @@
         <div style="font-size: 0.9em; display: flex; flex-wrap: wrap; gap: 15px;">
           <span>
             <input type="radio" name="style" value="ガチ勢" checked onchange="updatePreview()"> ガチ勢
-            <input type="radio" name="style" value="エンジョイ" onchange="updatePreview()"> エンジョイ
+            <input type="radio" name="style" value="エンジョイ勢" onchange="updatePreview()"> エンジョイ勢
           </span>
           <span>
             ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
@@ -121,11 +148,11 @@
       </div>
       <div class="form-group">
         <label>天則以外の趣味</label>
-        <input type="text" id="other-games" placeholder="例：他ゲーム、音楽、スポーツ等" oninput="updatePreview()">
+        <input type="text" id="other-games" placeholder="例：他ゲーム、音楽制作等" oninput="updatePreview()">
       </div>
       <div class="form-group">
         <label>一言コメント</label>
-        <textarea id="comment" rows="3" placeholder="何かあれば" oninput="updatePreview()"></textarea>
+        <textarea id="comment" rows="3" placeholder="何かあれば"></textarea>
       </div>
       
       <div class="btn-group">
@@ -171,7 +198,7 @@ let charImage = new Image();
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
 
-  // メインキャラのボタン生成
+  // メインキャラ生成
   charList.forEach(char => {
     const mb = document.createElement('div'); mb.className = 'char-btn';
     const mImg = document.createElement('img'); mImg.src = pngPath + char.file;
@@ -184,10 +211,10 @@ window.onload = () => {
     mS.appendChild(mb);
   });
 
-  // 諏訪子の次にランダムボタンを追加
+  // 【修正】ランダムボタンを最後に追加
   const rb = document.createElement('div');
-  rb.className = 'char-btn';
-  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:bold; color:var(--accent-color); background:#1a0f0a;">？</div>';
+  rb.className = 'char-btn random-btn-wide';
+  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:bold; color:var(--accent-color); background:#1a0f0a; border:1px solid var(--border-color);">？ RANDOM ？</div>';
   rb.onclick = () => {
     document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     rb.classList.add('selected');
@@ -196,7 +223,7 @@ window.onload = () => {
   };
   mS.appendChild(rb);
 
-  // サブキャラのボタン生成 (サブにはランダム不要)
+  // サブキャラ生成
   charList.forEach(char => {
     const sb = document.createElement('div'); sb.className = 'char-btn';
     const sImg = document.createElement('img'); sImg.src = pngPath + char.file;
