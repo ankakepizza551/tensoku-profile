@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - ランダム機能搭載版</title>
+<title>非想天則 プロフィールメーカー - カスタム版</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -48,7 +48,6 @@
   .char-btn:hover { transform: scale(1.05); }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
-  /* 選択不可UIのスタイル */
   .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
 
   .color-btn { padding: 8px 12px; background: #3e2723; border: 1px solid var(--border-color); color: #fff; cursor: pointer; }
@@ -100,10 +99,10 @@
             <input type="radio" name="style" value="エンジョイ" onchange="updatePreview()"> エンジョイ
           </span>
           <span>
-            ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不カ
+            ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
           </span>
           <span>
-            クラ：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不カ
+            クラ：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
           </span>
         </div>
       </div>
@@ -118,7 +117,7 @@
       </div>
       <div class="form-group">
         <label>得意キャラ・苦手キャラ</label>
-        <input type="text" id="matchup" placeholder="例：得意：チルノ / 苦手：幽々子" oninput="updatePreview()">
+        <input type="text" id="matchup" placeholder="例：得意：霊夢 / 苦手：早苗" oninput="updatePreview()">
       </div>
       <div class="form-group">
         <label>天則以外の趣味</label>
@@ -172,7 +171,20 @@ let charImage = new Image();
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
 
-  // --- ランダム枠の追加 ---
+  // メインキャラのボタン生成
+  charList.forEach(char => {
+    const mb = document.createElement('div'); mb.className = 'char-btn';
+    const mImg = document.createElement('img'); mImg.src = pngPath + char.file;
+    mb.appendChild(mImg);
+    if(char.name === selectedMain.name) mb.classList.add('selected');
+    mb.onclick = () => {
+      document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
+      mb.classList.add('selected'); selectedMain = char; loadCharImage();
+    };
+    mS.appendChild(mb);
+  });
+
+  // 諏訪子の次にランダムボタンを追加
   const rb = document.createElement('div');
   rb.className = 'char-btn';
   rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:bold; color:var(--accent-color); background:#1a0f0a;">？</div>';
@@ -184,17 +196,8 @@ window.onload = () => {
   };
   mS.appendChild(rb);
 
+  // サブキャラのボタン生成 (サブにはランダム不要)
   charList.forEach(char => {
-    const mb = document.createElement('div'); mb.className = 'char-btn';
-    const mImg = document.createElement('img'); mImg.src = pngPath + char.file;
-    mb.appendChild(mImg);
-    if(char.name === selectedMain.name) mb.classList.add('selected');
-    mb.onclick = () => {
-      document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
-      mb.classList.add('selected'); selectedMain = char; loadCharImage();
-    };
-    mS.appendChild(mb);
-    
     const sb = document.createElement('div'); sb.className = 'char-btn';
     const sImg = document.createElement('img'); sImg.src = pngPath + char.file;
     sb.appendChild(sImg);
@@ -291,7 +294,6 @@ function updatePreview() {
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`HOST: ${hS} / CLIENT: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
-  // キャラクタイメージ描画 (ランダム時は?を表示)
   if (selectedMain.id === "random") {
     ctx.fillStyle = '#1a0f0a';
     ctx.fillRect(460, 90, 300, 400); 
