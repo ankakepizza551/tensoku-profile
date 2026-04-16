@@ -20,7 +20,6 @@
   }
   .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
   
-  /* 立体的なタイトルエフェクト */
   .main-title { 
     text-align: center; margin: 30px 0; 
     font-family: 'Oswald', sans-serif; color: var(--accent-color);
@@ -51,7 +50,6 @@
   }
   .char-btn:hover::after, .char-btn.selected::after { opacity: 1; }
 
-  /* 通信設定の2段表示 */
   .connection-settings { display: flex; flex-direction: column; gap: 10px; }
   .connection-row { display: flex; align-items: center; font-size: 0.9em; }
   .connection-row span { width: 80px; font-weight: bold; color: var(--accent-color); }
@@ -86,7 +84,7 @@
           <div class="connection-row">
             <span>ホスト：</span>
             <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可
-            <input type="radio" name="host" value="不可" onchange="updatePreview()" style="margin-left: 15px;"> 不可
+            <input type="radio" name="host" value="不可" onchange="updatePreview()" style="margin-left: 15px;"> 不不可
           </div>
           <div class="connection-row">
             <span>クラ：</span>
@@ -113,20 +111,20 @@ const charList = [
   { name: "博麗霊夢", file: "Select_01Reimu.png" },
   { name: "霧雨魔理沙", file: "Select_02Marisa.png" },
   { name: "十六夜咲夜", file: "Select_03Sakuya.png" },
-  { name: "アリス", file: "Select_04Alice.png" },      // 修正済み
-  { name: "パチュリー", file: "Select_05Patchouli.png" }, // 修正済み
+  { name: "アリス", file: "Select_04Alice.png" },
+  { name: "パチュリー", file: "Select_05Patchouli.png" },
   { name: "魂魄妖夢", file: "Select_06Youmu.png" },
   { name: "レミリア", file: "Select_07Remilia.png" },
   { name: "西行寺幽々子", file: "Select_08Yuyuko.png" },
   { name: "八雲紫", file: "Select_09Yukari.png" },
   { name: "伊吹萃香", file: "Select_10Suika.png" },
-  { name: "鈴仙", file: "Select_11Reisen.png" },
+  { name: "鈴仙", file: "Select_11Udonge.png" },       // Reisen → Udonge に修正
   { name: "射命丸文", file: "Select_12Aya.png" },
   { name: "小野塚小町", file: "Select_13Komachi.png" },
   { name: "永江衣玖", file: "Select_14Iku.png" },
   { name: "比那名居天子", file: "Select_15Tenshi.png" },
   { name: "東風谷早苗", file: "Select_16Sanae.png" },
-  { name: "チルノ", file: "Select_17Cirno.png" },
+  { name: "チルノ", file: "Select_17Chirno.png" },      // Cirno → Chirno に修正
   { name: "紅美鈴", file: "Select_18Meirin.png" },
   { name: "霊烏路空", file: "Select_19Utsuho.png" },
   { name: "洩矢諏訪子", file: "Select_20Suwako.png" }
@@ -138,7 +136,7 @@ let charImage = new Image();
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
   charList.forEach(char => {
-    // メイン選択ボタン
+    // メイン
     const mb = document.createElement('div'); mb.className = 'char-btn';
     mb.setAttribute('data-name', char.name);
     const mImg = document.createElement('img'); mImg.src = imagePath + char.file;
@@ -150,7 +148,7 @@ window.onload = () => {
     };
     mS.appendChild(mb);
     
-    // サブ選択ボタン
+    // サブ
     const sb = document.createElement('div'); sb.className = 'char-btn';
     sb.setAttribute('data-name', char.name);
     const sImg = document.createElement('img'); sImg.src = imagePath + char.file;
