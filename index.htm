@@ -1,159 +1,273 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>非想天則風プロフィールジェネレーター</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #000000;
-            --accent-gold: #d4af37;
-            --text-white: #ffffff;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>非想天則 プロフィールメーカー - 統一フォント版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { 
+    --bg-color: #2b1e16; 
+    --text-color: #fdf5e6; 
+    --accent-color: #daa520; 
+    --border-color: #5d4037; 
+  }
+  body { 
+    /* 入力画面は読みやすさ優先の標準フォント */
+    font-family: sans-serif; 
+    background-color: #1a0f0a; 
+    color: var(--text-color); 
+    margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
+  }
+  .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
+  
+  /* タイトル部分のみ世界観に合わせる */
+  .main-title { 
+    text-align: center; color: var(--accent-color); margin: 20px 0; 
+    font-family: 'Oswald', sans-serif; letter-spacing: 4px; 
+  }
 
-        body {
-            font-family: sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-white);
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-        }
+  #profile-form { 
+    background-color: var(--bg-color); padding: 25px; border: 3px double var(--accent-color); 
+  }
+  .form-group { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+  label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--accent-color); font-size: 0.85em; }
+  
+  input[type="text"], textarea { 
+    width: 100%; padding: 10px; background: #1a0f0a; border: 1px solid var(--border-color); 
+    color: #fff; box-sizing: border-box; font-size: 16px;
+  }
 
-        .container {
-            width: 100%;
-            max-width: 500px; /* スマホで見やすい幅に固定 */
-            display: flex;
-            flex-direction: column; /* 縦並びに変更 */
-            gap: 20px;
-        }
+  .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
+  .char-btn { 
+    cursor: pointer; border: 1px solid var(--border-color); height: 40px; background: #3e2723; 
+    display: flex; align-items: center; justify-content: center; font-size: 10px; text-align: center; line-height: 1.1;
+    padding: 2px;
+  }
+  .char-btn.selected { border: 2px solid var(--accent-color); background: #5d4037; color: #fff; }
+  
+  .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+  #generate-btn { flex: 1; padding: 15px; background: var(--accent-color); font-weight: bold; cursor: pointer; border: none; font-family: 'Oswald', sans-serif; }
+  #download-btn { flex: 1; padding: 15px; background: #5d4037; color: white; font-weight: bold; cursor: pointer; border: 1px solid var(--accent-color); }
 
-        .input-section {
-            background: #222;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .input-section h2 {
-            font-size: 1.1rem;
-            margin-top: 0;
-            border-left: 4px solid var(--accent-gold);
-            padding-left: 10px;
-        }
-
-        .form-group { margin-bottom: 15px; }
-
-        label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: #aaa; }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #444;
-            background: #111;
-            color: #fff;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        /* プレビューエリアの修正 */
-        .preview-section {
-            width: 100%;
-        }
-
-        .preview-card {
-            width: 100%;
-            min-height: 200px;
-            background: var(--card-bg);
-            border: 2px solid var(--accent-gold);
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .p-label {
-            font-family: 'Oswald', sans-serif;
-            color: var(--accent-gold);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            margin: 0;
-        }
-
-        #p-name {
-            font-family: 'Noto Serif JP', serif;
-            font-weight: 900;
-            font-size: 2rem;
-            margin: 0;
-            letter-spacing: 0.05em;
-        }
-
-        #p-rank {
-            font-family: 'Oswald', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin: 0;
-        }
-
-        #p-comment {
-            font-family: 'Noto Serif JP', serif;
-            font-size: 0.9rem;
-            border-top: 1px solid #333;
-            padding-top: 10px;
-            margin: 0;
-        }
-    </style>
+  #output-area { width: 100%; margin-top: 20px; text-align: center; }
+  #card-canvas { display: none; }
+  #final-image { width: 100%; border: 4px solid var(--accent-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <div class="input-section">
-        <h2>設定入力</h2>
-        <div class="form-group">
-            <label>キャラクター名</label>
-            <input type="text" id="in-name" placeholder="博麗 霊夢" oninput="update()">
-        </div>
-        <div class="form-group">
-            <label>ランク (英数字)</label>
-            <input type="text" id="in-rank" placeholder="LUNATIC" oninput="update()">
-        </div>
-        <div class="form-group">
-            <label>一言コメント</label>
-            <input type="text" id="in-comment" placeholder="空を飛ぶ程度の能力" oninput="update()">
-        </div>
-    </div>
+  <div class="main-title">
+    <div style="font-size: 1.8rem; font-weight: 700;">⚙ HISOUTENSOKU ⚙</div>
+    <div style="font-size: 1.1rem; letter-spacing: 2px;">PROFILE GENERATOR</div>
+  </div>
 
-    <div class="preview-section">
-        <div class="preview-card">
-            <div>
-                <p class="p-label">Player Name</p>
-                <h1 id="p-name">博麗 霊夢</h1>
-            </div>
-            <div>
-                <p class="p-label">Rank Status</p>
-                <p id="p-rank">LUNATIC</p>
-            </div>
-            <div>
-                <p id="p-comment">空を飛ぶ程度の能力</p>
-            </div>
+  <div class="container">
+    <form id="profile-form">
+      <div class="form-group"><label>プレイヤー名</label><input type="text" id="name" placeholder="博麗 霊夢" oninput="updatePreview()"></div>
+      <div class="form-group"><label>段位 / レート</label><input type="text" id="rank" placeholder="LUNATIC" oninput="updatePreview()"></div>
+      
+      <div class="form-group">
+        <label>メインキャラ / カラー選択</label>
+        <div id="main-char-selector" class="char-grid"></div>
+        <div id="color-selector" style="display:flex; gap:5px; flex-wrap: wrap; margin-top: 5px;"></div>
+      </div>
+
+      <div class="form-group"><label>サブキャラ選択</label><div id="sub-char-selector" class="char-grid"></div></div>
+
+      <div class="form-group">
+        <label>プレイスタイル</label>
+        <div style="font-size: 0.9em;">
+          <input type="radio" name="style" value="ガチ勢" checked onchange="updatePreview()"> ガチ勢
+          <input type="radio" name="style" value="エンジョイ" onchange="updatePreview()"> エンジョイ
         </div>
+      </div>
+
+      <div class="form-group">
+        <label>ホスト / クライアント設定</label>
+        <div style="font-size: 0.9em;">
+          ホスト：
+          <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可
+          <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
+          <span style="margin: 0 10px;">|</span>
+          クラ：
+          <input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可
+          <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
+        </div>
+      </div>
+
+      <div class="form-group"><label>活動時間帯</label><input type="text" id="time" placeholder="21:00〜24:00" oninput="updatePreview()"></div>
+      <div class="form-group"><label>使用デバイス</label><input type="text" id="device" placeholder="アケコン / キーボード" oninput="updatePreview()"></div>
+      <div class="form-group"><label>得意・苦手</label><input type="text" id="matchup" oninput="updatePreview()"></div>
+      <div class="form-group"><label>天則以外の趣味</label><input type="text" id="other-games" oninput="updatePreview()"></div>
+      <div class="form-group"><label>一言コメント</label><textarea id="comment" rows="3" oninput="updatePreview()"></textarea></div>
+      
+      <div class="btn-group">
+        <button type="button" id="generate-btn" onclick="updatePreview()">再描画 (REDRAW)</button>
+        <button type="button" id="download-btn" onclick="downloadImage()">画像として保存</button>
+      </div>
+    </form>
+
+    <div id="output-area">
+      <canvas id="card-canvas" width="800" height="900"></canvas>
+      <img id="final-image" alt="Profile Card">
     </div>
-</div>
+  </div>
 
 <script>
-    function update() {
-        document.getElementById('p-name').innerText = document.getElementById('in-name').value || '博麗 霊夢';
-        document.getElementById('p-rank').innerText = (document.getElementById('in-rank').value || 'LUNATIC').toUpperCase();
-        document.getElementById('p-comment').innerText = document.getElementById('in-comment').value || '空を飛ぶ程度の能力';
-    }
-</script>
+// キャラクター名のリスト
+const charFullNames = [
+  "博麗霊夢", "霧雨魔理沙", "十六夜咲夜", "アリス・マーガトロイド", 
+  "パチュリー・ノーレッジ", "魂魄妖夢", "レミリア・スカーレット", 
+  "西行寺幽々子", "八雲紫", "伊吹萃香", "鈴仙・優曇華院・イナバ", 
+  "射命丸文", "小野塚小町", "永江衣玖", "比那名居天子", 
+  "東風谷早苗", "チルノ", "紅美鈴", "霊烏路空", "洩矢諏訪子"
+];
 
+const charIdMap = {
+  "博麗霊夢":"reimu","霧雨魔理沙":"marisa","十六夜咲夜":"sakuya",
+  "アリス・マーガトロイド":"alice","パチュリー・ノーレッジ":"patche",
+  "魂魄妖夢":"youmu","レミリア・スカーレット":"remilia",
+  "西行寺幽々子":"yuyuko","八雲紫":"yukari","伊吹萃香":"suika",
+  "鈴仙・優曇華院・イナバ":"reisen","射命丸文":"aya","小野塚小町":"komachi",
+  "永江衣玖":"iku","比那名居天子":"tenshi","東風谷早苗":"sanae",
+  "チルノ":"cirno","紅美鈴":"meirin","霊烏路空":"utsuho","洩矢諏訪子":"suwako"
+};
+
+let selectedMain = "博麗霊夢", selectedSubs = [], selectedColor = "1";
+let charImage = new Image();
+
+window.onload = () => {
+  const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
+  charFullNames.forEach(name => {
+    const mb = document.createElement('div'); mb.className='char-btn'; mb.innerText=name;
+    if(name===selectedMain) mb.classList.add('selected');
+    mb.onclick=()=>{
+      document.querySelectorAll('#main-char-selector .char-btn').forEach(e=>e.classList.remove('selected'));
+      mb.classList.add('selected'); selectedMain=name; loadCharImage();
+    };
+    mS.appendChild(mb);
+    
+    const sb = document.createElement('div'); sb.className='char-btn'; sb.innerText=name;
+    sb.onclick=()=>{
+      if(selectedSubs.includes(name)){selectedSubs=selectedSubs.filter(n=>n!==name); sb.classList.remove('selected');}
+      else{selectedSubs.push(name); sb.classList.add('selected');}
+      updatePreview();
+    };
+    sS.appendChild(sb);
+  });
+  updateColorSelector();
+  loadCharImage();
+};
+
+function updateColorSelector() {
+  const c = document.getElementById('color-selector'); c.innerHTML='';
+  for(let i=1;i<=8;i++){
+    const b=document.createElement('button'); b.style.padding="5px"; if(i==selectedColor) b.style.background="#daa520";
+    b.innerText=i+'P'; b.onclick=(e)=>{e.preventDefault(); selectedColor=i; updateColorSelector(); loadCharImage();};
+    c.appendChild(b);
+  }
+}
+
+function loadCharImage() {
+  const folder = charIdMap[selectedMain];
+  charImage.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
+  charImage.onload = () => updatePreview();
+  charImage.onerror = () => updatePreview();
+}
+
+function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
+  let line = '';
+  for (let n = 0; n < text.length; n++) {
+    let testLine = line + text[n];
+    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y); line = text[n]; y += lineHeight;
+    } else { line = text[n] === '\\n' ? line : testLine; }
+  }
+  ctx.fillText(line, x, y); return y;
+}
+
+function updatePreview() {
+  const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
+  
+  // 背景描画
+  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 900);
+  ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
+  for(let i=0; i<800; i+=4) { for(let j=0; j<900; j+=4) { ctx.fillRect(i, j, 1, 1); } }
+  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 860);
+
+  // タイトル（英数字用フォント）
+  ctx.fillStyle = brass; ctx.font = 'bold 28px "Oswald"'; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
+
+  const drawLbl = (l, x, y) => { ctx.fillStyle = brass; ctx.font = 'bold 15px "Oswald"'; ctx.fillText(l, x, y); };
+  
+  // プレイヤー名とランク（重厚な明朝体）
+  const name = document.getElementById('name').value || 'プレイヤー未設定';
+  const rank = document.getElementById('rank').value || 'RANK UNKNOWN';
+  
+  drawLbl('PLAYER NAME', 55, 130);
+  ctx.fillStyle = '#fdf5e6'; ctx.font = '900 50px "Noto Serif JP"'; 
+  ctx.fillText(name, 55, 185);
+
+  drawLbl('RANK / RATE', 55, 230);
+  ctx.font = '700 30px "Oswald"'; ctx.fillText(rank, 55, 265);
+
+  // キャラクター情報
+  drawLbl('MAIN CHARACTER', 55, 315);
+  ctx.font = '700 22px "Noto Serif JP"'; ctx.fillText(`${selectedMain} (${selectedColor}P)`, 55, 345);
+  
+  drawLbl('SUB CHARACTERS', 55, 395); 
+  ctx.font = '700 16px "Noto Serif JP"';
+  let subY = drawWrap(ctx, selectedSubs.join(' / ') || 'なし', 55, 425, 380, 24);
+  
+  // その他ステータス
+  const style = document.querySelector('input[name="style"]:checked').value;
+  const time = document.getElementById('time').value || '未設定';
+  const host = document.querySelector('input[name="host"]:checked').value;
+  const client = document.querySelector('input[name="client"]:checked').value;
+  const device = document.getElementById('device').value || '未設定';
+  const matchup = document.getElementById('matchup').value || '---';
+  const other = document.getElementById('other-games').value || '---';
+  const comment = document.getElementById('comment').value || '---';
+
+  let nextY = subY + 55;
+  drawLbl('STYLE / TIME', 55, nextY);
+  ctx.font = '700 18px "Noto Serif JP"'; ctx.fillText(`${style} / ${time}`, 55, nextY + 30);
+
+  drawLbl('HOST / CLIENT', 55, nextY + 85);
+  ctx.fillText(`ホスト: ${host} / クライアント: ${client}`, 55, nextY + 115);
+
+  drawLbl('INPUT DEVICE', 55, nextY + 170);
+  ctx.fillText(device, 55, nextY + 200);
+
+  // キャラクター画像
+  if(charImage.complete && charImage.naturalWidth !== 0) {
+    ctx.drawImage(charImage, 460, 90);
+    ctx.strokeStyle = brass; ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
+  }
+  
+  // 右側項目
+  let rightY = 460;
+  drawLbl('MATCHUP (GOOD/BAD)', 460, rightY);
+  ctx.font = '700 16px "Noto Serif JP"'; ctx.fillText(matchup, 460, rightY + 30);
+
+  drawLbl('OTHER INTERESTS', 460, rightY + 75);
+  let otherY = drawWrap(ctx, other, 460, rightY + 105, 290, 22);
+
+  drawLbl('MESSAGE', 460, otherY + 45);
+  drawWrap(ctx, comment, 460, otherY + 75, 290, 20);
+
+  document.getElementById('final-image').src = canvas.toDataURL('image/png');
+}
+
+function downloadImage() {
+  const link = document.createElement('a');
+  link.download = `Profile_${document.getElementById('name').value || 'th123'}.png`;
+  link.href = document.getElementById('final-image').src;
+  link.click();
+}
+</script>
 </body>
 </html>
