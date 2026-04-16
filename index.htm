@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - 最終調整版</title>
+<title>非想天則 プロフィールメーカー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -15,9 +15,7 @@
     --border-color: #5d4037; 
   }
   body { 
-    font-family: sans-serif; 
-    background-color: #1a0f0a; 
-    color: var(--text-color); 
+    font-family: sans-serif; background-color: #1a0f0a; color: var(--text-color); 
     margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
   }
   .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
@@ -25,62 +23,32 @@
   /* 1. タイトルの立体エフェクト */
   .main-title { 
     text-align: center; margin: 30px 0; 
-    font-family: 'Oswald', sans-serif;
-    color: var(--accent-color);
-    /* 重厚な金属風の立体感 */
-    text-shadow: 
-      0 1px 0 #ccc, 
-      0 2px 0 #c9c9c9, 
-      0 3px 0 #bbb, 
-      0 4px 0 #b9b9b9, 
-      0 5px 0 #aaa, 
-      0 6px 1px rgba(0,0,0,.1), 
-      0 0 5px rgba(0,0,0,.1), 
-      0 1px 3px rgba(0,0,0,.3), 
-      0 3px 5px rgba(0,0,0,.2), 
-      0 5px 10px rgba(0,0,0,.25), 
-      0 10px 10px rgba(0,0,0,.2), 
-      0 20px 20px rgba(0,0,0,.15);
+    font-family: 'Oswald', sans-serif; color: var(--accent-color);
+    text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 5px 10px rgba(0,0,0,.25);
   }
 
-  #profile-form { 
-    background-color: var(--bg-color); padding: 25px; border: 3px double var(--accent-color); 
-  }
+  #profile-form { background-color: var(--bg-color); padding: 25px; border: 3px double var(--accent-color); }
   .form-group { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
   label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--accent-color); font-size: 0.85em; }
   
   input[type="text"], textarea { 
-    width: 100%; padding: 10px; background: #1a0f0a; border: 1px solid var(--border-color); 
-    color: #fff; box-sizing: border-box; font-size: 16px;
+    width: 100%; padding: 10px; background: #1a0f0a; border: 1px solid var(--border-color); color: #fff; box-sizing: border-box; font-size: 16px;
   }
 
-  /* 2. ホスト・クラの2段表示用スタイル */
-  .connection-settings {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .connection-row {
-    display: flex;
-    align-items: center;
-    font-size: 0.9em;
-  }
-  .connection-row span {
-    width: 80px;
-    font-weight: bold;
-    color: var(--accent-color);
-  }
+  /* 2. ホスト・クラの2段表示 */
+  .connection-settings { display: flex; flex-direction: column; gap: 10px; }
+  .connection-row { display: flex; align-items: center; font-size: 0.9em; }
+  .connection-row span { width: 80px; font-weight: bold; color: var(--accent-color); }
 
   .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
   .char-btn { 
     cursor: pointer; border: 1px solid var(--border-color); height: 40px; background: #3e2723; 
-    display: flex; align-items: center; justify-content: center; font-size: 10px; text-align: center; line-height: 1.1;
-    padding: 2px;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; text-align: center; line-height: 1.1; padding: 2px;
   }
   .char-btn.selected { border: 2px solid var(--accent-color); background: #5d4037; color: #fff; }
   
   .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-  #generate-btn { flex: 1; padding: 15px; background: var(--accent-color); font-weight: bold; cursor: pointer; border: none; font-family: 'Oswald', sans-serif; }
+  #generate-btn { flex: 2; padding: 15px; background: var(--accent-color); font-weight: bold; cursor: pointer; border: none; font-family: 'Oswald', sans-serif; }
   #download-btn { flex: 1; padding: 15px; background: #5d4037; color: white; font-weight: bold; cursor: pointer; border: 1px solid var(--accent-color); }
 
   #output-area { width: 100%; margin-top: 20px; text-align: center; }
@@ -100,21 +68,8 @@
       <div class="form-group"><label>プレイヤー名</label><input type="text" id="name" placeholder="博麗 霊夢" oninput="updatePreview()"></div>
       <div class="form-group"><label>段位 / レート</label><input type="text" id="rank" placeholder="LUNATIC" oninput="updatePreview()"></div>
       
-      <div class="form-group">
-        <label>メインキャラ / カラー選択</label>
-        <div id="main-char-selector" class="char-grid"></div>
-        <div id="color-selector" style="display:flex; gap:5px; flex-wrap: wrap; margin-top: 5px;"></div>
-      </div>
-
+      <div class="form-group"><label>メインキャラ選択</label><div id="main-char-selector" class="char-grid"></div></div>
       <div class="form-group"><label>サブキャラ選択</label><div id="sub-char-selector" class="char-grid"></div></div>
-
-      <div class="form-group">
-        <label>プレイスタイル</label>
-        <div style="font-size: 0.9em;">
-          <input type="radio" name="style" value="ガチ勢" checked onchange="updatePreview()"> ガチ勢
-          <input type="radio" name="style" value="エンジョイ" onchange="updatePreview()"> エンジョイ
-        </div>
-      </div>
 
       <div class="form-group">
         <label>通信設定 (Host / Client)</label>
@@ -132,177 +87,130 @@
         </div>
       </div>
 
-      <div class="form-group"><label>活動時間帯</label><input type="text" id="time" placeholder="21:00〜24:00" oninput="updatePreview()"></div>
-      <div class="form-group"><label>使用デバイス</label><input type="text" id="device" placeholder="アケコン / キーボード" oninput="updatePreview()"></div>
-      <div class="form-group"><label>得意・苦手</label><input type="text" id="matchup" oninput="updatePreview()"></div>
-      <div class="form-group"><label>天則以外の趣味</label><input type="text" id="other-games" oninput="updatePreview()"></div>
+      <div class="form-group"><label>活動時間帯</label><input type="text" id="time" placeholder="21:00〜" oninput="updatePreview()"></div>
       <div class="form-group"><label>一言コメント</label><textarea id="comment" rows="3" oninput="updatePreview()"></textarea></div>
       
       <div class="btn-group">
         <button type="button" id="generate-btn" onclick="updatePreview()">再描画 (REDRAW)</button>
-        <button type="button" id="download-btn" onclick="downloadImage()">画像として保存</button>
+        <button type="button" id="download-btn" onclick="downloadImage()">画像保存</button>
       </div>
     </form>
-
-    <div id="output-area">
-      <canvas id="card-canvas" width="800" height="900"></canvas>
-      <img id="final-image" alt="Profile Card">
-    </div>
+    <div id="output-area"><canvas id="card-canvas" width="800" height="650"></canvas><img id="final-image"></div>
   </div>
 
 <script>
-// (JavaScript部分は前回から変更なしのため、中身は省略せずに最新の状態を維持します)
-const charFullNames = [
-  "博麗霊夢", "霧雨魔理沙", "十六夜咲夜", "アリス・マーガトロイド", 
-  "パチュリー・ノーレッジ", "魂魄妖夢", "レミリア・スカーレット", 
-  "西行寺幽々子", "八雲紫", "伊吹萃香", "鈴仙・優曇華院・イナバ", 
-  "射命丸文", "小野塚小町", "永江衣玖", "比那名居天子", 
-  "東風谷早苗", "チルノ", "紅美鈴", "霊烏路空", "洩矢諏訪子"
+// 画像ファイルリスト (ProfileSelectPNGフォルダ内)
+const charList = [
+  { name: "博麗霊夢", file: "Select_01Reimu.png" },
+  { name: "霧雨魔理沙", file: "Select_02Marisa.png" },
+  { name: "十六夜咲夜", file: "Select_03Sakuya.png" },
+  { name: "アリス", file: "Select_04Alice.png" },
+  { name: "パチュリー", file: "Select_05Patchouli.png" },
+  { name: "魂魄妖夢", file: "Select_06Youmu.png" },
+  { name: "レミリア", file: "Select_07Remilia.png" },
+  { name: "西行寺幽々子", file: "Select_08Yuyuko.png" },
+  { name: "八雲紫", file: "Select_09Yukari.png" },
+  { name: "伊吹萃香", file: "Select_10Suika.png" },
+  { name: "鈴仙", file: "Select_11Reisen.png" },
+  { name: "射命丸文", file: "Select_12Aya.png" },
+  { name: "小野塚小町", file: "Select_13Komachi.png" },
+  { name: "永江衣玖", file: "Select_14Iku.png" },
+  { name: "比那名居天子", file: "Select_15Tenshi.png" },
+  { name: "東風谷早苗", file: "Select_16Sanae.png" },
+  { name: "チルノ", file: "Select_17Cirno.png" },
+  { name: "紅美鈴", file: "Select_18Meirin.png" },
+  { name: "霊烏路空", file: "Select_19Utsuho.png" },
+  { name: "洩矢諏訪子", file: "Select_20Suwako.png" }
 ];
 
-const charIdMap = {
-  "博麗霊夢":"reimu","霧雨魔理沙":"marisa","十六夜咲夜":"sakuya",
-  "アリス・マーガトロイド":"alice","パチュリー・ノーレッジ":"patche",
-  "魂魄妖夢":"youmu","レミリア・スカーレット":"remilia",
-  "西行寺幽々子":"yuyuko","八雲紫":"yukari","伊吹萃香":"suika",
-  "鈴仙・優曇華院・イナバ":"reisen","射命丸文":"aya","小野塚小町":"komachi",
-  "永江衣玖":"iku","比那名居天子":"tenshi","東風谷早苗":"sanae",
-  "チルノ":"cirno","紅美鈴":"meirin","霊烏路空":"utsuho","洩矢諏訪子":"suwako"
-};
-
-let selectedMain = "博麗霊夢", selectedSubs = [], selectedColor = "1";
+let selectedMain = charList[0], selectedSubs = [];
 let charImage = new Image();
 
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
-  charFullNames.forEach(name => {
-    const mb = document.createElement('div'); mb.className='char-btn'; mb.innerText=name;
-    if(name===selectedMain) mb.classList.add('selected');
+  charList.forEach(char => {
+    const mb = document.createElement('div'); mb.className='char-btn'; mb.innerText=char.name;
+    if(char.name===selectedMain.name) mb.classList.add('selected');
     mb.onclick=()=>{
       document.querySelectorAll('#main-char-selector .char-btn').forEach(e=>e.classList.remove('selected'));
-      mb.classList.add('selected'); selectedMain=name; loadCharImage();
+      mb.classList.add('selected'); selectedMain=char; loadCharImage();
     };
     mS.appendChild(mb);
     
-    const sb = document.createElement('div'); sb.className='char-btn'; sb.innerText=name;
+    const sb = document.createElement('div'); sb.className='char-btn'; sb.innerText=char.name;
     sb.onclick=()=>{
-      if(selectedSubs.includes(name)){selectedSubs=selectedSubs.filter(n=>n!==name); sb.classList.remove('selected');}
-      else{selectedSubs.push(name); sb.classList.add('selected');}
+      if(selectedSubs.includes(char.name)){selectedSubs=selectedSubs.filter(n=>n!==char.name); sb.classList.remove('selected');}
+      else{selectedSubs.push(char.name); sb.classList.add('selected');}
       updatePreview();
     };
     sS.appendChild(sb);
   });
-  updateColorSelector();
   loadCharImage();
 };
 
-function updateColorSelector() {
-  const c = document.getElementById('color-selector'); c.innerHTML='';
-  for(let i=1;i<=8;i++){
-    const b=document.createElement('button'); b.style.padding="5px"; if(i==selectedColor) b.style.background="#daa520";
-    b.innerText=i+'P'; b.onclick=(e)=>{e.preventDefault(); selectedColor=i; updateColorSelector(); loadCharImage();};
-    c.appendChild(b);
-  }
-}
-
 function loadCharImage() {
-  const folder = charIdMap[selectedMain];
-  charImage.src = `./image/${folder}/${folder}-${selectedColor}p.jpg`;
-  charImage.onload = () => updatePreview();
-  charImage.onerror = () => updatePreview();
-}
-
-function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
-  let line = '';
-  for (let n = 0; n < text.length; n++) {
-    let testLine = line + text[n];
-    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-      ctx.strokeText(line, x, y); ctx.fillText(line, x, y); line = text[n]; y += lineHeight;
-    } else { line = testLine; }
-  }
-  ctx.strokeText(line, x, y); ctx.fillText(line, x, y); return y;
+  charImage.src = `./image/ProfileSelectPNG/${selectedMain.file}`;
+  charImage.onload = updatePreview;
+  charImage.onerror = () => { console.error("画像なし:", charImage.src); updatePreview(); };
 }
 
 function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
-  
-  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 900);
-  ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
-  for(let i=0; i<800; i+=4) { for(let j=0; j<900; j+=4) { ctx.fillRect(i, j, 1, 1); } }
-  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 860);
+  ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 650);
+  ctx.fillStyle = 'rgba(218, 165, 32, 0.05)';
+  for(let i=0; i<800; i+=4) { for(let j=0; j<650; j+=4) { ctx.fillRect(i, j, 1, 1); } }
+  ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 610);
 
   ctx.lineJoin = "round";
   ctx.miterLimit = 2;
 
-  const drawTextWithOutline = (text, x, y, font, fillStyle, outlineWidth = 4) => {
-    ctx.font = font;
-    ctx.lineWidth = outlineWidth;
-    ctx.strokeStyle = '#000000';
-    ctx.strokeText(text, x, y);
-    ctx.fillStyle = fillStyle;
-    ctx.fillText(text, x, y);
+  const drawOutlinedText = (text, x, y, font, fill, width=4) => {
+    ctx.font = font; ctx.lineWidth = width; ctx.strokeStyle = '#000';
+    ctx.strokeText(text || '---', x, y); ctx.fillStyle = fill; ctx.fillText(text || '---', x, y);
   };
 
-  const drawLbl = (l, x, y) => { drawTextWithOutline(l, x, y, 'bold 15px "Oswald"', brass, 3); };
+  drawOutlinedText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 70, 'bold 24px Oswald', brass, 5);
+  drawOutlinedText('PLAYER NAME', 55, 130, 'bold 14px Oswald', brass, 3);
+  drawOutlinedText(document.getElementById('name').value, 55, 185, '900 45px "Noto Serif JP"', '#fdf5e6', 6);
   
-  const name = document.getElementById('name').value || 'プレイヤー未設定';
-  const rank = document.getElementById('rank').value || 'RANK UNKNOWN';
+  drawOutlinedText('RANK / STATUS', 55, 240, 'bold 14px Oswald', brass, 3);
+  drawOutlinedText(document.getElementById('rank').value, 55, 275, '700 25px Oswald', '#fdf5e6', 4);
   
-  drawTextWithOutline('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75, 'bold 28px "Oswald"', brass, 5);
+  drawOutlinedText('MAIN CHARACTER', 55, 335, 'bold 14px Oswald', brass, 3);
+  drawOutlinedText(selectedMain.name, 55, 365, '700 20px "Noto Serif JP"', '#fdf5e6', 4);
 
-  drawLbl('PLAYER NAME', 55, 130);
-  drawTextWithOutline(name, 55, 185, '900 50px "Noto Serif JP"', '#fdf5e6', 6);
+  drawOutlinedText('SUB CHARACTERS', 55, 415, 'bold 14px Oswald', brass, 3);
+  drawOutlinedText(selectedSubs.join(' / ') || 'なし', 55, 445, '16px "Noto Serif JP"', '#fdf5e6', 3);
 
-  drawLbl('RANK / RATE', 55, 230);
-  drawTextWithOutline(rank, 55, 265, '700 30px "Oswald"', '#fdf5e6', 4);
+  const h = document.querySelector('input[name="host"]:checked').value;
+  const c = document.querySelector('input[name="client"]:checked').value;
+  drawOutlinedText('CONNECTION', 55, 500, 'bold 14px Oswald', brass, 3);
+  drawOutlinedText(`HOST: ${h} / CLIENT: ${c}`, 55, 530, '18px sans-serif', '#fdf5e6', 3);
 
-  drawLbl('MAIN CHARACTER', 55, 315);
-  drawTextWithOutline(`${selectedMain} (${selectedColor}P)`, 55, 345, '700 22px "Noto Serif JP"', '#fdf5e6', 4);
-  
-  drawLbl('SUB CHARACTERS', 55, 395); 
-  ctx.font = '700 16px "Noto Serif JP"';
-  ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
-  let subY = drawWrap(ctx, selectedSubs.join(' / ') || 'なし', 55, 425, 380, 24);
-  
-  const style = document.querySelector('input[name="style"]:checked').value;
-  const time = document.getElementById('time').value || '未設定';
-  const host = document.querySelector('input[name="host"]:checked').value;
-  const client = document.querySelector('input[name="client"]:checked').value;
-  const device = document.getElementById('device').value || '未設定';
-  const matchup = document.getElementById('matchup').value || '---';
-  const other = document.getElementById('other-games').value || '---';
-  const comment = document.getElementById('comment').value || '---';
-
-  let nextY = subY + 55;
-  drawLbl('STYLE / TIME', 55, nextY);
-  drawTextWithOutline(`${style} / ${time}`, 55, nextY + 30, '700 18px "Noto Serif JP"', '#fdf5e6', 3);
-
-  drawLbl('HOST / CLIENT', 55, nextY + 85);
-  drawTextWithOutline(`ホスト: ${host} / クラ: ${client}`, 55, nextY + 115, '700 18px "Noto Serif JP"', '#fdf5e6', 3);
-
-  drawLbl('INPUT DEVICE', 55, nextY + 170);
-  drawTextWithOutline(device, 55, nextY + 200, '700 18px "Noto Serif JP"', '#fdf5e6', 3);
+  drawOutlinedText('ACTIVE TIME', 55, 575, 'bold 14px Oswald', brass, 3);
+  drawOutlinedText(document.getElementById('time').value, 55, 600, '18px sans-serif', '#fdf5e6', 3);
 
   if(charImage.complete && charImage.naturalWidth !== 0) {
     ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.8)";
-    ctx.shadowBlur = 15;
-    ctx.drawImage(charImage, 460, 90);
+    ctx.shadowColor = "rgba(0,0,0,0.8)"; ctx.shadowBlur = 12;
+    ctx.drawImage(charImage, 450, 90, 300, 300); 
     ctx.restore();
-    ctx.strokeStyle = brass; ctx.lineWidth = 3; ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(448, 88, 304, 304);
   }
-  
-  let rightY = 460;
-  drawLbl('MATCHUP (GOOD/BAD)', 460, rightY);
-  drawTextWithOutline(matchup, 460, rightY + 30, '700 16px "Noto Serif JP"', '#fdf5e6', 3);
 
-  drawLbl('OTHER INTERESTS', 460, rightY + 75);
-  ctx.font = '700 16px "Noto Serif JP"';
-  ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
-  let otherY = drawWrap(ctx, other, 460, rightY + 105, 290, 22);
-
-  drawLbl('MESSAGE', 460, otherY + 45);
-  drawWrap(ctx, comment, 460, otherY + 75, 290, 20);
+  drawOutlinedText('MESSAGE', 450, 440, 'bold 14px Oswald', brass, 3);
+  const comment = document.getElementById('comment').value || '---';
+  ctx.font = '15px "Noto Serif JP"';
+  ctx.fillStyle = '#fdf5e6';
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+  let line = '', y = 470;
+  for(let n=0; n<comment.length; n++){
+    let test = line + comment[n];
+    if(ctx.measureText(test).width > 300 && n > 0){
+      ctx.strokeText(line, 450, y); ctx.fillText(line, 450, y); line = comment[n]; y += 22;
+    } else { line = test; }
+  }
+  ctx.strokeText(line, 450, y); ctx.fillText(line, 450, y);
 
   document.getElementById('final-image').src = canvas.toDataURL('image/png');
 }
