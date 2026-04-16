@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー</title>
+<title>非想天則 プロフィールメーカー - RE-ADJUSTED</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -34,7 +34,6 @@
     width: 100%; padding: 10px; background: #1a0f0a; border: 1px solid var(--border-color); color: #fff; box-sizing: border-box; font-size: 16px;
   }
 
-  /* キャラクター選択画像ボタン */
   .char-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
   .char-btn { 
     cursor: pointer; border: 2px solid var(--border-color); background: #3e2723; 
@@ -84,7 +83,7 @@
           <div class="connection-row">
             <span>ホスト：</span>
             <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可
-            <input type="radio" name="host" value="不可" onchange="updatePreview()" style="margin-left: 15px;"> 不不可
+            <input type="radio" name="host" value="不可" onchange="updatePreview()" style="margin-left: 15px;"> 不可
           </div>
           <div class="connection-row">
             <span>クラ：</span>
@@ -118,13 +117,13 @@ const charList = [
   { name: "西行寺幽々子", file: "Select_08Yuyuko.png" },
   { name: "八雲紫", file: "Select_09Yukari.png" },
   { name: "伊吹萃香", file: "Select_10Suika.png" },
-  { name: "鈴仙", file: "Select_11Udonge.png" },       // Reisen → Udonge に修正
+  { name: "鈴仙", file: "Select_11Udonge.png" },
   { name: "射命丸文", file: "Select_12Aya.png" },
   { name: "小野塚小町", file: "Select_13Komachi.png" },
   { name: "永江衣玖", file: "Select_14Iku.png" },
   { name: "比那名居天子", file: "Select_15Tenshi.png" },
   { name: "東風谷早苗", file: "Select_16Sanae.png" },
-  { name: "チルノ", file: "Select_17Chirno.png" },      // Cirno → Chirno に修正
+  { name: "チルノ", file: "Select_17Chirno.png" },
   { name: "紅美鈴", file: "Select_18Meirin.png" },
   { name: "霊烏路空", file: "Select_19Utsuho.png" },
   { name: "洩矢諏訪子", file: "Select_20Suwako.png" }
@@ -136,7 +135,6 @@ let charImage = new Image();
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
   charList.forEach(char => {
-    // メイン
     const mb = document.createElement('div'); mb.className = 'char-btn';
     mb.setAttribute('data-name', char.name);
     const mImg = document.createElement('img'); mImg.src = imagePath + char.file;
@@ -148,7 +146,6 @@ window.onload = () => {
     };
     mS.appendChild(mb);
     
-    // サブ
     const sb = document.createElement('div'); sb.className = 'char-btn';
     sb.setAttribute('data-name', char.name);
     const sImg = document.createElement('img'); sImg.src = imagePath + char.file;
@@ -209,12 +206,11 @@ function updatePreview() {
   drawOutlinedText('ACTIVE TIME', 55, 575, 'bold 14px Oswald', brass, 3);
   drawOutlinedText(document.getElementById('time').value, 55, 600, '18px sans-serif', '#fdf5e6', 3);
 
+  // 【画像描画部分を以前の方式に復元】サイズ指定せず原寸で描画
   if(charImage.complete && charImage.naturalWidth !== 0) {
-    ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.8)"; ctx.shadowBlur = 12;
-    ctx.drawImage(charImage, 450, 90, 300, 300); 
-    ctx.restore();
-    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(448, 88, 304, 304);
+    ctx.drawImage(charImage, 460, 90); 
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; 
+    ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
   }
 
   drawOutlinedText('MESSAGE', 450, 440, 'bold 14px Oswald', brass, 3);
