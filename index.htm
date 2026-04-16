@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>非想天則 プロフィールメーカー - 1ファイル完結版</title>
+<title>非想天則 プロフィールメーカー - ランダム機能搭載版</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -47,6 +47,9 @@
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn:hover { transform: scale(1.05); }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
+
+  /* 選択不可UIのスタイル */
+  .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
 
   .color-btn { padding: 8px 12px; background: #3e2723; border: 1px solid var(--border-color); color: #fff; cursor: pointer; }
   .color-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
@@ -97,10 +100,10 @@
             <input type="radio" name="style" value="エンジョイ" onchange="updatePreview()"> エンジョイ
           </span>
           <span>
-            ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
+            ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不カ
           </span>
           <span>
-            クラ：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
+            クラ：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不カ
           </span>
         </div>
       </div>
@@ -168,6 +171,19 @@ let charImage = new Image();
 
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
+
+  // --- ランダム枠の追加 ---
+  const rb = document.createElement('div');
+  rb.className = 'char-btn';
+  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:bold; color:var(--accent-color); background:#1a0f0a;">？</div>';
+  rb.onclick = () => {
+    document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
+    rb.classList.add('selected');
+    selectedMain = { name: "ランダム", id: "random" };
+    loadCharImage();
+  };
+  mS.appendChild(rb);
+
   charList.forEach(char => {
     const mb = document.createElement('div'); mb.className = 'char-btn';
     const mImg = document.createElement('img'); mImg.src = pngPath + char.file;
@@ -211,9 +227,22 @@ function updateColorSelector() {
 }
 
 function loadCharImage() {
-  charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.jpg`;
-  charImage.onload = () => updatePreview();
-  charImage.onerror = () => { charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.jpg`; };
+  const colorUI = document.getElementById('color-selector');
+  const subUI = document.getElementById('sub-char-selector');
+
+  if (selectedMain.id === "random") {
+    colorUI.classList.add('disabled-ui');
+    subUI.classList.add('disabled-ui');
+    selectedSubs = [];
+    document.querySelectorAll('#sub-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
+    updatePreview();
+  } else {
+    colorUI.classList.remove('disabled-ui');
+    subUI.classList.remove('disabled-ui');
+    charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.jpg`;
+    charImage.onload = () => updatePreview();
+    charImage.onerror = () => { charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.jpg`; };
+  }
 }
 
 function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
@@ -251,7 +280,7 @@ function updatePreview() {
 
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
   drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
-  drawLbl('MAIN CHARACTER', 55, 305); drawDat(`${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
+  drawLbl('MAIN CHARACTER', 55, 305); drawDat(selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
   
   drawLbl('SUB CHARACTERS', 55, 385); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
@@ -262,13 +291,24 @@ function updatePreview() {
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`HOST: ${hS} / CLIENT: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
-  if(charImage.complete && charImage.naturalWidth !== 0) {
+  // キャラクタイメージ描画 (ランダム時は?を表示)
+  if (selectedMain.id === "random") {
+    ctx.fillStyle = '#1a0f0a';
+    ctx.fillRect(460, 90, 300, 400); 
+    ctx.strokeStyle = brass; ctx.lineWidth = 2;
+    ctx.strokeRect(458, 88, 304, 404);
+    ctx.fillStyle = brass;
+    ctx.font = 'bold 150px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('？', 460 + 150, 90 + 260);
+    ctx.textAlign = 'left';
+  } else if(charImage.complete && charImage.naturalWidth !== 0) {
     ctx.drawImage(charImage, 460, 90);
     ctx.strokeStyle = brass; ctx.lineWidth = 2;
     ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
   }
   
-  let rightY = charImage.height > 300 ? 110 + charImage.height + 30 : 460;
+  let rightY = (selectedMain.id === "random" ? 400 : charImage.height) > 300 ? 110 + (selectedMain.id === "random" ? 400 : charImage.height) + 30 : 460;
   drawLbl('得意キャラ・苦手キャラ', 460, rightY); drawDat(document.getElementById('matchup').value, 460, rightY + 30, 'bold 16px serif');
   drawLbl('OTHER INTERESTS', 460, rightY + 75); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, rightY + 105, 290, 22);
