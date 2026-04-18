@@ -328,4 +328,53 @@ function updatePreview() {
   ctx.fillStyle = brass; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
 
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
-  drawLbl('RANK / RATE', 55, 230); drawDat(rank,
+  drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
+  drawLbl('MAIN CHARACTER', 55, 305); drawDat(selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
+  drawLbl('SUB CHARACTERS', 55, 385); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  const subNames = selectedSubs.map(s => s.name).join(', ') || '---';
+  let subY = drawWrap(ctx, subNames, 55, 415, 380, 22);
+  let nextY = subY + 40;
+  drawLbl('STYLE / TIME', 55, nextY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, nextY + 30, 'bold 18px serif');
+  drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
+  drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
+
+  const rightX = 460;
+  const rightTop = 90;
+  const rightBoxSize = 300; 
+
+  if (selectedMain.id === "random") {
+    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, rightBoxSize, rightBoxSize); 
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, rightBoxSize + 4, rightBoxSize + 4);
+    
+    // ピクセル走査による完全中央描画を実行
+    drawCenteredText(ctx, '？', rightX + (rightBoxSize / 2), rightTop + (rightBoxSize / 2), 'bold 180px serif');
+    
+  } else if(charImage.complete && charImage.naturalWidth !== 0) {
+    ctx.drawImage(charImage, rightX, rightTop);
+    ctx.strokeStyle = brass; ctx.lineWidth = 2;
+    ctx.strokeRect(rightX - 2, rightTop - 2, charImage.width + 4, charImage.height + 4);
+  }
+  
+  let currentRightY = 460; 
+  drawLbl('MATCHUP (PROS/CONS)', rightX, currentRightY); 
+  drawDat(document.getElementById('matchup').value, rightX, currentRightY + 30, 'bold 16px serif');
+  drawLbl('OTHER INTERESTS', rightX, currentRightY + 75); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', rightX, currentRightY + 105, 290, 22);
+  drawLbl('COMMENT', rightX, otherY + 40); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
+  drawWrap(ctx, document.getElementById('comment').value || '---', rightX, otherY + 70, 290, 20);
+
+  document.getElementById('final-image').src = canvas.toDataURL('image/png');
+}
+
+function downloadImage() {
+  const link = document.createElement('a');
+  link.download = `Profile_${document.getElementById('name').value || 'th123'}.png`;
+  link.href = document.getElementById('final-image').src;
+  link.click();
+}
+</script>
+</body>
+</html>
