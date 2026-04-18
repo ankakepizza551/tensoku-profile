@@ -268,16 +268,12 @@ function loadCharImage() {
     subUI.classList.remove('disabled-ui');
     const ext = 'jpg';
     const targetSrc = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.${ext}`;
-    if (charImage.src.indexOf(targetSrc.replace('./', '')) === -1) {
-        charImage.onload = () => updatePreview();
-        charImage.onerror = () => { 
-            charImage.onerror = null; 
-            charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.${ext}`; 
-        };
-        charImage.src = targetSrc;
-    } else {
-        updatePreview();
-    }
+    charImage.onload = () => updatePreview();
+    charImage.onerror = () => { 
+        charImage.onerror = null; 
+        charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.${ext}`; 
+    };
+    charImage.src = targetSrc;
   }
 }
 
@@ -331,35 +327,26 @@ function updatePreview() {
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
-  // キャラクター表示エリアの共通設定
+  // キャラクター表示エリア（サイズそのまま描画）
   const charBoxX = 460;
   const charBoxY = 90;
-  const charBoxW = 300;
-  const charBoxH = 400;
 
   if (selectedMain.id === "random") {
-    ctx.fillStyle = '#1a0f0a'; 
-    ctx.fillRect(charBoxX, charBoxY, charBoxW, charBoxH); 
-    
-    ctx.strokeStyle = brass; 
-    ctx.lineWidth = 2; 
-    ctx.strokeRect(charBoxX - 2, charBoxY - 2, charBoxW + 4, charBoxH + 4);
-    
-    ctx.fillStyle = brass; 
-    ctx.font = 'bold 100px serif'; // ?のサイズを小さく調整
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('？', charBoxX + (charBoxW / 2), charBoxY + (charBoxH / 2)); 
-    
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
+    // ランダム時は標準サイズ(300x400)で枠を作成
+    const w = 300, h = 400;
+    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(charBoxX, charBoxY, w, h); 
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(charBoxX - 2, charBoxY - 2, w + 4, h + 4);
+    ctx.fillStyle = brass; ctx.font = 'bold 100px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('？', charBoxX + (w / 2), charBoxY + (h / 2)); 
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
-    // 枠に合わせて画像を描画
-    ctx.drawImage(charImage, charBoxX, charBoxY, charBoxW, charBoxH);
-    
-    ctx.strokeStyle = brass; 
-    ctx.lineWidth = 2;
-    ctx.strokeRect(charBoxX - 2, charBoxY - 2, charBoxW + 4, charBoxH + 4);
+    // 画像を元サイズで描画
+    const w = charImage.naturalWidth;
+    const h = charImage.naturalHeight;
+    ctx.drawImage(charImage, charBoxX, charBoxY);
+    // 枠線を画像サイズに合わせる
+    ctx.strokeStyle = brass; ctx.lineWidth = 2;
+    ctx.strokeRect(charBoxX - 2, charBoxY - 2, w + 4, h + 4);
   }
   
   let rightY = 520;
