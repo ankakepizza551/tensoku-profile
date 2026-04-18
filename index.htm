@@ -323,18 +323,21 @@ function updatePreview() {
   let currentRightY = 460; 
 
   if (selectedMain.id === "random") {
+    // ボックス描画
     ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, 300, 300); 
     ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, 304, 304);
     
+    // 文字の描画設定
     ctx.fillStyle = brass; 
-    ctx.font = 'bold 120px serif'; 
+    ctx.font = 'bold 140px serif'; 
     ctx.textAlign = 'center';      
-    ctx.textBaseline = 'middle';   
-    // 「？」の配置。150(中心)にさらに+25pxすることで画像の位置に合わせました
-    ctx.fillText('？', rightX + 150, rightTop + 150 + 25); 
+    ctx.textBaseline = 'alphabetic'; // ブラウザのクセが出にくい標準設定に戻す
     
+    // Y座標計算: rightTop(90) + ボックス中央(150) + フォント高さの微調整(約50px)
+    ctx.fillText('？', rightX + 150, rightTop + 205); 
+    
+    // 設定をリセット
     ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic'; 
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
     ctx.drawImage(charImage, rightX, rightTop);
     ctx.strokeStyle = brass; ctx.lineWidth = 2;
