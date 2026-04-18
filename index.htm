@@ -49,7 +49,13 @@
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
-  .random-btn-wide { grid-column: span 5; height: 50px; margin-top: 5px; }
+  /* ランダムボタン専用スタイル */
+  .random-btn-wide { 
+    grid-column: span 5; 
+    aspect-ratio: auto !important; 
+    height: 50px; 
+    margin-top: 5px; 
+  }
 
   .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
 
@@ -207,7 +213,7 @@ window.onload = () => {
 
   const rb = document.createElement('div');
   rb.className = 'char-btn random-btn-wide';
-  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:bold; color:var(--accent-color); background:#1a0f0a; border:1px solid var(--border-color);">？ RANDOM ？</div>';
+  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:bold; color:var(--accent-color); background:#1a0f0a; border:1px solid var(--border-color);">？ RANDOM ？</div>';
   rb.onclick = () => {
     document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     rb.classList.add('selected');
@@ -245,7 +251,6 @@ function loadCharImage() {
     colorUI.classList.remove('disabled-ui');
     subUI.classList.remove('disabled-ui');
     
-    // 全て .jpg で統一
     const ext = 'jpg';
     const targetSrc = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.${ext}`;
     
