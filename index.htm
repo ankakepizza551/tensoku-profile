@@ -323,11 +323,20 @@ function updatePreview() {
   let currentRightY = 460; // 固定の基準位置
 
   if (selectedMain.id === "random") {
-    // ランダムボックスのサイズを300pxに縮小
+    // ランダムボックスの描画
     ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, 300, 300); 
     ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, 304, 304);
-    ctx.fillStyle = brass; ctx.font = 'bold 120px serif'; ctx.textAlign = 'center';
-    ctx.fillText('？', rightX + 150, rightTop + 200); ctx.textAlign = 'left';
+    
+    // 左右・上下中央に配置
+    ctx.fillStyle = brass; 
+    ctx.font = 'bold 120px serif'; 
+    ctx.textAlign = 'center';      
+    ctx.textBaseline = 'middle';   
+    ctx.fillText('？', rightX + 150, rightTop + 150); 
+    
+    // 設定を戻す
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic'; 
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
     ctx.drawImage(charImage, rightX, rightTop);
     ctx.strokeStyle = brass; ctx.lineWidth = 2;
