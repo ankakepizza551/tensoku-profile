@@ -274,13 +274,19 @@ function loadCharImage() {
 
 function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
   let line = '';
+  let currentY = y;
   for (let n = 0; n < text.length; n++) {
     let testLine = line + text[n];
     if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-      ctx.fillText(line, x, y); line = text[n]; y += lineHeight;
-    } else { line = testLine; }
+      ctx.fillText(line, x, currentY); 
+      line = text[n]; 
+      currentY += lineHeight;
+    } else { 
+      line = testLine; 
+    }
   }
-  ctx.fillText(line, x, y); return y;
+  ctx.fillText(line, x, currentY); 
+  return currentY; // 描き終わった最終行のY座標を返す
 }
 
 function updatePreview() {
@@ -322,7 +328,7 @@ function updatePreview() {
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
-  // キャラクター表示エリア（ランダム時はコンパクトに）
+  // キャラクター表示エリア
   const charBoxX = 460;
   const charBoxY = 90;
 
@@ -341,12 +347,25 @@ function updatePreview() {
     ctx.strokeRect(charBoxX, charBoxY, w, h);
   }
   
+  // 右側項目の描画（ここから改行対応の修正箇所）
   let rightY = 460;
-  drawLbl('MATCHUP (PROS/CONS)', 460, rightY); drawDat(document.getElementById('matchup').value, 460, rightY + 30, 'bold 16px serif');
-  drawLbl('OTHER INTERESTS', 460, rightY + 75); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
-  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, rightY + 105, 290, 22);
-  drawLbl('COMMENT', 460, otherY + 40); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
-  drawWrap(ctx, document.getElementById('comment').value || '---', 460, otherY + 70, 290, 20);
+  
+  // 得意キャラ・苦手キャラ
+  drawLbl('MATCHUP (PROS/CONS)', 460, rightY); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 16px serif';
+  let matchupY = drawWrap(ctx, document.getElementById('matchup').value || '---', 460, rightY + 30, 290, 22);
+
+  // 他の趣味 (matchupY の位置から動的に配置)
+  let interestsStartY = matchupY + 45;
+  drawLbl('OTHER INTERESTS', 460, interestsStartY); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, interestsStartY + 30, 290, 22);
+  
+  // 一言コメント (otherY の位置から動的に配置)
+  let commentStartY = otherY + 45;
+  drawLbl('COMMENT', 460, commentStartY); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
+  drawWrap(ctx, document.getElementById('comment').value || '---', 460, commentStartY + 30, 290, 20);
 
   document.getElementById('final-image').src = canvas.toDataURL('image/png');
 }
