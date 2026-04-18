@@ -50,7 +50,6 @@
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
-  /* ランダムボタンの修正：高さを固定し中央揃え */
   .random-btn-wide { 
     grid-column: span 5 !important; 
     aspect-ratio: auto !important; 
@@ -128,12 +127,12 @@
         <div class="connection-row">
           ホスト：
           <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 
-          <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不カ
+          <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
         </div>
         <div class="connection-row">
           クライアント：
           <input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 
-          <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不カ
+          <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
         </div>
       </div>
 
@@ -332,24 +331,38 @@ function updatePreview() {
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
-  // キャラクター表示エリア
+  // キャラクター表示エリアの共通設定
+  const charBoxX = 460;
+  const charBoxY = 90;
+  const charBoxW = 300;
+  const charBoxH = 400;
+
   if (selectedMain.id === "random") {
-    ctx.strokeStyle = brass; ctx.lineWidth = 2;
-    ctx.strokeRect(458, 88, 304, 404);
-    ctx.fillStyle = brass;
-    ctx.font = 'bold 200px serif';
+    ctx.fillStyle = '#1a0f0a'; 
+    ctx.fillRect(charBoxX, charBoxY, charBoxW, charBoxH); 
+    
+    ctx.strokeStyle = brass; 
+    ctx.lineWidth = 2; 
+    ctx.strokeRect(charBoxX - 2, charBoxY - 2, charBoxW + 4, charBoxH + 4);
+    
+    ctx.fillStyle = brass; 
+    ctx.font = 'bold 100px serif'; // ?のサイズを小さく調整
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('？', 460 + 152, 90 + 200);
+    ctx.fillText('？', charBoxX + (charBoxW / 2), charBoxY + (charBoxH / 2)); 
+    
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
-    ctx.drawImage(charImage, 460, 90);
-    ctx.strokeStyle = brass; ctx.lineWidth = 2;
-    ctx.strokeRect(458, 88, 304, 404);
+    // 枠に合わせて画像を描画
+    ctx.drawImage(charImage, charBoxX, charBoxY, charBoxW, charBoxH);
+    
+    ctx.strokeStyle = brass; 
+    ctx.lineWidth = 2;
+    ctx.strokeRect(charBoxX - 2, charBoxY - 2, charBoxW + 4, charBoxH + 4);
   }
   
-  let rightY = 520; // 460から調整
+  let rightY = 520;
   drawLbl('MATCHUP (PROS/CONS)', 460, rightY); drawDat(document.getElementById('matchup').value, 460, rightY + 30, 'bold 16px serif');
   drawLbl('OTHER INTERESTS', 460, rightY + 75); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, rightY + 105, 290, 22);
