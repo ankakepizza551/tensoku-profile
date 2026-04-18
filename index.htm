@@ -45,22 +45,25 @@
   .char-btn { 
     cursor: pointer; border: 2px solid var(--border-color); background: #3e2723; 
     position: relative; aspect-ratio: 1 / 1; overflow: hidden; transition: 0.1s;
+    display: flex; align-items: center; justify-content: center;
   }
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
+  /* ランダムボタンの修正：高さを固定し中央揃え */
   .random-btn-wide { 
     grid-column: span 5 !important; 
     aspect-ratio: auto !important; 
-    height: auto !important; 
-    min-height: 50px;
+    height: 60px !important; 
     margin-top: 5px; 
-  }
-  .random-inner {
-    width: 100%; height: 100%; padding: 12px 0;
-    display: flex; align-items: center; justify-content: center; 
-    font-size: 18px; font-weight: bold; color: var(--accent-color); 
-    background: #1a0f0a; border: 1px solid var(--border-color);
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent-color);
+    background: #1a0f0a;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
@@ -71,6 +74,8 @@
     color: #fff; cursor: pointer; font-size: 12px; text-align: center;
   }
   .color-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
+
+  .connection-row { margin-bottom: 8px; font-size: 0.9em; }
 
   .btn-group { display: flex; gap: 10px; margin-top: 20px; }
   #generate-btn { flex: 1; padding: 15px; background: var(--accent-color); font-weight: bold; cursor: pointer; border: none; }
@@ -120,9 +125,15 @@
 
       <div class="form-group">
         <label>通信設定</label>
-        <div style="display: flex; gap: 20px; font-size: 0.9em;">
-          <div>ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不不可</div>
-          <div>クライアント：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可</div>
+        <div class="connection-row">
+          ホスト：
+          <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 
+          <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不カ
+        </div>
+        <div class="connection-row">
+          クライアント：
+          <input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 
+          <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不カ
         </div>
       </div>
 
@@ -165,14 +176,14 @@ const charList = [
   { name: "博麗霊夢", id: "reimu", file: "Select_01Reimu.png" },
   { name: "霧雨魔理沙", id: "marisa", file: "Select_02Marisa.png" },
   { name: "十六夜咲夜", id: "sakuya", file: "Select_03Sakuya.png" },
-  { name: "アリス", id: "alice", file: "Select_04Alice.png" },
-  { name: "パチュリー", id: "patchouli", file: "Select_05Patchouli.png" },
+  { name: "アリス・マーガトロイド", id: "alice", file: "Select_04Alice.png" },
+  { name: "パチュリー・ノーレッジ", id: "patchouli", file: "Select_05Patchouli.png" },
   { name: "魂魄妖夢", id: "youmu", file: "Select_06Youmu.png" },
-  { name: "レミリア", id: "remilia", file: "Select_07Remilia.png" },
+  { name: "レミリア・スカーレット", id: "remilia", file: "Select_07Remilia.png" },
   { name: "西行寺幽々子", id: "yuyuko", file: "Select_08Yuyuko.png" },
   { name: "八雲紫", id: "yukari", file: "Select_09Yukari.png" },
   { name: "伊吹萃香", id: "suika", file: "Select_10Suika.png" },
-  { name: "鈴仙", id: "reisen", file: "Select_11Udonge.png" },
+  { name: "鈴仙・優曇華院・イナバ", id: "reisen", file: "Select_11Udonge.png" },
   { name: "射命丸文", id: "aya", file: "Select_12Aya.png" },
   { name: "小野塚小町", id: "komachi", file: "Select_13Komachi.png" },
   { name: "永江衣玖", id: "iku", file: "Select_14Iku.png" },
@@ -189,6 +200,7 @@ let charImage = new Image();
 
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
+  
   charList.forEach(char => {
     const mb = document.createElement('div'); mb.className = 'char-btn';
     const mImg = document.createElement('img'); mImg.src = selectPngPath + char.file;
@@ -199,6 +211,7 @@ window.onload = () => {
       mb.classList.add('selected'); selectedMain = char; loadCharImage();
     };
     mS.appendChild(mb);
+
     const sb = document.createElement('div'); sb.className = 'char-btn';
     const sImg = document.createElement('img'); sImg.src = selectPngPath + char.file;
     sb.appendChild(sImg);
@@ -214,9 +227,10 @@ window.onload = () => {
     };
     sS.appendChild(sb);
   });
+
   const rb = document.createElement('div');
   rb.className = 'char-btn random-btn-wide';
-  rb.innerHTML = '<div class="random-inner">？ RANDOM ？</div>';
+  rb.innerText = '？ RANDOM ？';
   rb.onclick = () => {
     document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     rb.classList.add('selected');
@@ -224,6 +238,7 @@ window.onload = () => {
     loadCharImage();
   };
   mS.appendChild(rb);
+
   updateColorSelector();
   loadCharImage();
 };
@@ -241,17 +256,29 @@ function updateColorSelector() {
 }
 
 function loadCharImage() {
+  const colorUI = document.getElementById('color-selector');
+  const subUI = document.getElementById('sub-char-selector');
   if (selectedMain.id === "random") {
+    colorUI.classList.add('disabled-ui');
+    subUI.classList.add('disabled-ui');
+    selectedSubs = [];
+    document.querySelectorAll('#sub-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     updatePreview();
   } else {
+    colorUI.classList.remove('disabled-ui');
+    subUI.classList.remove('disabled-ui');
     const ext = 'jpg';
     const targetSrc = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.${ext}`;
-    charImage.onload = () => updatePreview();
-    charImage.onerror = () => { 
-        charImage.onerror = null; 
-        charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.${ext}`; 
-    };
-    charImage.src = targetSrc;
+    if (charImage.src.indexOf(targetSrc.replace('./', '')) === -1) {
+        charImage.onload = () => updatePreview();
+        charImage.onerror = () => { 
+            charImage.onerror = null; 
+            charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.${ext}`; 
+        };
+        charImage.src = targetSrc;
+    } else {
+        updatePreview();
+    }
   }
 }
 
@@ -266,49 +293,10 @@ function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
   ctx.fillText(line, x, y); return y;
 }
 
-// 文字の「見た目」の中心を合わせるための関数
-function drawCenteredText(mainCtx, text, centerX, centerY, font) {
-  const tempCanvas = document.createElement('canvas');
-  const size = 400; // 十分な大きさ
-  tempCanvas.width = size;
-  tempCanvas.height = size;
-  const tCtx = tempCanvas.getContext('2d');
-  
-  tCtx.font = font;
-  tCtx.fillStyle = '#daa520';
-  tCtx.textAlign = 'center';
-  tCtx.textBaseline = 'middle';
-  tCtx.fillText(text, size / 2, size / 2);
-  
-  // 描画されたピクセルをスキャンして最小のバウンディングボックスを見つける
-  const pixels = tCtx.getImageData(0, 0, size, size).data;
-  let minX = size, minY = size, maxX = 0, maxY = 0;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const alpha = pixels[(y * size + x) * 4 + 3];
-      if (alpha > 0) {
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-      }
-    }
-  }
-  
-  const textWidth = maxX - minX;
-  const textHeight = maxY - minY;
-  
-  // 抽出した文字パーツをメインキャンバスの中心に転送
-  mainCtx.drawImage(
-    tempCanvas, 
-    minX, minY, textWidth, textHeight, 
-    centerX - textWidth / 2, centerY - textHeight / 2, textWidth, textHeight
-  );
-}
-
 function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
   ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 800);
+  
   ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
   for(let i=0; i<800; i+=4) { for(let j=0; j<800; j+=4) { ctx.fillRect(i, j, 1, 1); } }
   ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 760);
@@ -329,42 +317,44 @@ function updatePreview() {
 
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
   drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
-  drawLbl('MAIN CHARACTER', 55, 305); drawDat(selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
+  
+  drawLbl('MAIN CHARACTER', 55, 305); 
+  const mainName = selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`;
+  drawDat(mainName, 55, 335, 'bold 20px serif');
+  
   drawLbl('SUB CHARACTERS', 55, 385); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   const subNames = selectedSubs.map(s => s.name).join(', ') || '---';
   let subY = drawWrap(ctx, subNames, 55, 415, 380, 22);
+  
   let nextY = subY + 40;
   drawLbl('STYLE / TIME', 55, nextY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, nextY + 30, 'bold 18px serif');
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
-  const rightX = 460;
-  const rightTop = 90;
-  const rightBoxSize = 300; 
-
+  // キャラクター表示エリア
   if (selectedMain.id === "random") {
-    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, rightBoxSize, rightBoxSize); 
-    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, rightBoxSize + 4, rightBoxSize + 4);
-    
-    // ピクセル走査による完全中央描画を実行
-    drawCenteredText(ctx, '？', rightX + (rightBoxSize / 2), rightTop + (rightBoxSize / 2), 'bold 180px serif');
-    
-  } else if(charImage.complete && charImage.naturalWidth !== 0) {
-    ctx.drawImage(charImage, rightX, rightTop);
     ctx.strokeStyle = brass; ctx.lineWidth = 2;
-    ctx.strokeRect(rightX - 2, rightTop - 2, charImage.width + 4, charImage.height + 4);
+    ctx.strokeRect(458, 88, 304, 404);
+    ctx.fillStyle = brass;
+    ctx.font = 'bold 200px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('？', 460 + 152, 90 + 200);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+  } else if(charImage.complete && charImage.naturalWidth !== 0) {
+    ctx.drawImage(charImage, 460, 90);
+    ctx.strokeStyle = brass; ctx.lineWidth = 2;
+    ctx.strokeRect(458, 88, 304, 404);
   }
   
-  let currentRightY = 460; 
-  drawLbl('MATCHUP (PROS/CONS)', rightX, currentRightY); 
-  drawDat(document.getElementById('matchup').value, rightX, currentRightY + 30, 'bold 16px serif');
-  drawLbl('OTHER INTERESTS', rightX, currentRightY + 75); 
-  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
-  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', rightX, currentRightY + 105, 290, 22);
-  drawLbl('COMMENT', rightX, otherY + 40); 
-  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
-  drawWrap(ctx, document.getElementById('comment').value || '---', rightX, otherY + 70, 290, 20);
+  let rightY = 520; // 460から調整
+  drawLbl('MATCHUP (PROS/CONS)', 460, rightY); drawDat(document.getElementById('matchup').value, 460, rightY + 30, 'bold 16px serif');
+  drawLbl('OTHER INTERESTS', 460, rightY + 75); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, rightY + 105, 290, 22);
+  drawLbl('COMMENT', 460, otherY + 40); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
+  drawWrap(ctx, document.getElementById('comment').value || '---', 460, otherY + 70, 290, 20);
 
   document.getElementById('final-image').src = canvas.toDataURL('image/png');
 }
