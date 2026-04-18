@@ -45,6 +45,7 @@
   .char-btn { 
     cursor: pointer; border: 2px solid var(--border-color); background: #3e2723; 
     position: relative; aspect-ratio: 1 / 1; overflow: hidden; transition: 0.1s;
+    display: flex; align-items: center; justify-content: center;
   }
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
@@ -54,6 +55,14 @@
     aspect-ratio: auto !important; 
     height: 60px !important; 
     margin-top: 5px; 
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent-color);
+    background: #1a0f0a;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
@@ -87,7 +96,7 @@
     <form id="profile-form">
       <div class="form-group">
         <label>プレイヤー名</label>
-        <textarea id="name" rows="2" placeholder="例：無名のプレイヤー" oninput="updatePreview()"></textarea>
+        <input type="text" id="name" placeholder="例：無名のプレイヤー" oninput="updatePreview()">
       </div>
       <div class="form-group">
         <label>段位 / レート</label>
@@ -136,8 +145,8 @@
         <input type="text" id="device" placeholder="例：F310、キーボード、アケコン等" oninput="updatePreview()">
       </div>
       <div class="form-group">
-        <label>得意キャラ・苦手キャラ (改行可)</label>
-        <textarea id="matchup" rows="4" placeholder="例：得意：霊夢 / 苦手：早苗" oninput="updatePreview()"></textarea>
+        <label>得意キャラ・苦手キャラ</label>
+        <input type="text" id="matchup" placeholder="例：得意：霊夢 / 苦手：早苗" oninput="updatePreview()">
       </div>
       <div class="form-group">
         <label>天則以外の趣味</label>
@@ -190,7 +199,6 @@ let charImage = new Image();
 
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
-  
   charList.forEach(char => {
     const mb = document.createElement('div'); mb.className = 'char-btn';
     const mImg = document.createElement('img'); mImg.src = selectPngPath + char.file;
@@ -201,7 +209,6 @@ window.onload = () => {
       mb.classList.add('selected'); selectedMain = char; loadCharImage();
     };
     mS.appendChild(mb);
-
     const sb = document.createElement('div'); sb.className = 'char-btn';
     const sImg = document.createElement('img'); sImg.src = selectPngPath + char.file;
     sb.appendChild(sImg);
@@ -217,10 +224,9 @@ window.onload = () => {
     };
     sS.appendChild(sb);
   });
-
   const rb = document.createElement('div');
   rb.className = 'char-btn random-btn-wide';
-  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold; color:var(--accent-color); background:#1a0f0a; border:1px solid var(--border-color);">？ RANDOM ？</div>';
+  rb.innerText = '？ RANDOM ？';
   rb.onclick = () => {
     document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     rb.classList.add('selected');
@@ -228,7 +234,6 @@ window.onload = () => {
     loadCharImage();
   };
   mS.appendChild(rb);
-
   updateColorSelector();
   loadCharImage();
 };
@@ -246,60 +251,35 @@ function updateColorSelector() {
 }
 
 function loadCharImage() {
-  const colorUI = document.getElementById('color-selector');
-  const subUI = document.getElementById('sub-char-selector');
+  const colorUI = document.getElementById('color-selector'), subUI = document.getElementById('sub-char-selector');
   if (selectedMain.id === "random") {
-    colorUI.classList.add('disabled-ui');
-    subUI.classList.add('disabled-ui');
-    selectedSubs = [];
-    document.querySelectorAll('#sub-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
+    colorUI.classList.add('disabled-ui'); subUI.classList.add('disabled-ui');
+    selectedSubs = []; document.querySelectorAll('#sub-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     updatePreview();
   } else {
-    colorUI.classList.remove('disabled-ui');
-    subUI.classList.remove('disabled-ui');
+    colorUI.classList.remove('disabled-ui'); subUI.classList.remove('disabled-ui');
     const ext = 'jpg';
     const targetSrc = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.${ext}`;
-    if (charImage.src.indexOf(targetSrc.replace('./', '')) === -1) {
-        charImage.onload = () => updatePreview();
-        charImage.onerror = () => { 
-            charImage.onerror = null; 
-            charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.${ext}`; 
-        };
-        charImage.src = targetSrc;
-    } else {
-        updatePreview();
-    }
+    charImage.onload = () => updatePreview();
+    charImage.onerror = () => { charImage.onerror = null; charImage.src = `./image/${selectedMain.id}/${selectedMain.id}-1p.${ext}`; };
+    charImage.src = targetSrc;
   }
 }
 
-// 改行対応描画関数
 function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
-  const lines = text.split('\n'); // 手動改行を維持
-  let currentY = y;
-  
-  lines.forEach(l => {
-    let line = '';
-    for (let n = 0; n < l.length; n++) {
-      let testLine = line + l[n];
-      if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-        ctx.fillText(line, x, currentY); 
-        line = l[n]; 
-        currentY += lineHeight;
-      } else { 
-        line = testLine; 
-      }
-    }
-    ctx.fillText(line, x, currentY); 
-    currentY += lineHeight;
-  });
-  
-  return currentY - lineHeight; // 最終描画位置を返す
+  let line = '';
+  for (let n = 0; n < text.length; n++) {
+    let testLine = line + text[n];
+    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y); line = text[n]; y += lineHeight;
+    } else { line = testLine; }
+  }
+  ctx.fillText(line, x, y); return y;
 }
 
 function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
   ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 800);
-  
   ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
   for(let i=0; i<800; i+=4) { for(let j=0; j<800; j+=4) { ctx.fillRect(i, j, 1, 1); } }
   ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 760);
@@ -307,51 +287,32 @@ function updatePreview() {
   const drawLbl = (l, x, y) => { ctx.fillStyle = brass; ctx.font = 'bold 13px serif'; ctx.fillText(`【 ${l} 】`, x, y); };
   const drawDat = (d, x, y, f) => { ctx.fillStyle = '#fdf5e6'; ctx.font = f; ctx.fillText(d || '---', x, y); };
   
-  const name = document.getElementById('name').value;
-  const rank = document.getElementById('rank').value;
+  const name = document.getElementById('name').value, rank = document.getElementById('rank').value;
   const style = document.querySelector('input[name="style"]:checked').value;
   const hS = document.querySelector('input[name="host"]:checked').value;
   const cS = document.querySelector('input[name="client"]:checked').value;
 
-  // タイトル
-  ctx.font = 'bold 24px Oswald';
-  ctx.lineWidth = 5; ctx.strokeStyle = '#000';
-  ctx.strokeText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
-  ctx.fillStyle = brass; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
+  ctx.font = 'bold 24px Oswald'; ctx.lineWidth = 5; ctx.strokeStyle = '#000';
+  ctx.strokeText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75); ctx.fillStyle = brass; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
 
-  // 左側：基本情報（プレイヤー名改行対応）
-  drawLbl('PLAYER NAME', 55, 130);
-  ctx.fillStyle = '#fdf5e6';
-  ctx.font = 'bold 44px serif';
-  let nameEndY = drawWrap(ctx, name || '無名のプレイヤー', 55, 180, 380, 50);
-
-  let rankY = nameEndY + 45;
-  drawLbl('RANK / RATE', 55, rankY); drawDat(rank, 55, rankY + 30, 'bold 24px serif');
-  
-  let mainY = rankY + 75;
-  drawLbl('MAIN CHARACTER', 55, mainY); 
+  drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
+  drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
+  drawLbl('MAIN CHARACTER', 55, 305); 
   const mainName = selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`;
-  drawDat(mainName, 55, mainY + 30, 'bold 20px serif');
+  drawDat(mainName, 55, 335, 'bold 20px serif');
   
-  let subLabelY = mainY + 80;
-  drawLbl('SUB CHARACTERS', 55, subLabelY); 
-  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  drawLbl('SUB CHARACTERS', 55, 385); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   const subNames = selectedSubs.map(s => s.name).join(', ') || '---';
-  let subY = drawWrap(ctx, subNames, 55, subLabelY + 30, 380, 22);
+  let subY = drawWrap(ctx, subNames, 55, 415, 380, 22);
   
-  let styleY = subY + 45;
-  drawLbl('STYLE / TIME', 55, styleY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, styleY + 30, 'bold 18px serif');
-  
-  let hostY = styleY + 85;
-  drawLbl('HOST / CLIENT', 55, hostY); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, hostY + 115, 'bold 18px serif');
-  
-  let deviceY = hostY + 170;
-  drawLbl('DEVICE', 55, deviceY); drawDat(document.getElementById('device').value, 55, deviceY + 30, 'bold 17px serif');
+  let leftY = subY + 40;
+  drawLbl('STYLE / TIME', 55, leftY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, leftY + 30, 'bold 18px serif');
+  drawLbl('HOST / CLIENT', 55, leftY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, leftY + 115, 'bold 18px serif');
+  drawLbl('DEVICE', 55, leftY + 170); drawDat(document.getElementById('device').value, 55, leftY + 200, 'bold 17px serif');
 
-  // キャラクター画像表示
-  const charBoxX = 460;
-  const charBoxY = 90;
-
+  // 右側の描画（キャラ画像）
+  const charBoxX = 460, charBoxY = 90;
+  let charBottomY = 90;
   if (selectedMain.id === "random") {
     const w = 240, h = 320;
     ctx.fillStyle = '#1a0f0a'; ctx.fillRect(charBoxX, charBoxY, w, h); 
@@ -359,39 +320,33 @@ function updatePreview() {
     ctx.fillStyle = brass; ctx.font = 'bold 100px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('？', charBoxX + (w / 2), charBoxY + (h / 2) + 10); 
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    charBottomY = charBoxY + h;
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
-    const w = charImage.naturalWidth;
-    const h = charImage.naturalHeight;
     ctx.drawImage(charImage, charBoxX, charBoxY);
-    ctx.strokeStyle = brass; ctx.lineWidth = 2;
-    ctx.strokeRect(charBoxX, charBoxY, w, h);
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(charBoxX, charBoxY, charImage.naturalWidth, charImage.naturalHeight);
+    charBottomY = charBoxY + charImage.naturalHeight;
   }
-  
-  // 右側：自由記述項目
-  let rightY = 460;
-  
-  drawLbl('MATCHUP (PROS/CONS)', 460, rightY); 
-  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 16px serif';
-  let matchupY = drawWrap(ctx, document.getElementById('matchup').value || '---', 460, rightY + 30, 290, 22);
 
-  let interestsStartY = matchupY + 45;
-  drawLbl('OTHER INTERESTS', 460, interestsStartY); 
-  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
-  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, interestsStartY + 30, 290, 22);
+  // --- 修正箇所：右側の自由記述欄の開始位置を動的に計算 ---
+  // キャラ画像の高さか、左側の「MAIN CHARACTER」ラベル付近、どちらか低い方から開始
+  let rightStartY = Math.max(charBottomY + 30, 385); 
   
-  let commentStartY = otherY + 45;
-  drawLbl('COMMENT', 460, commentStartY); 
-  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
-  drawWrap(ctx, document.getElementById('comment').value || '---', 460, commentStartY + 30, 290, 20);
+  drawLbl('MATCHUP (PROS/CONS)', 460, rightStartY); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 16px serif';
+  let matchupY = drawWrap(ctx, document.getElementById('matchup').value || '---', 460, rightStartY + 30, 290, 22);
+
+  drawLbl('OTHER INTERESTS', 460, matchupY + 45); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, matchupY + 75, 290, 22);
+  
+  drawLbl('COMMENT', 460, otherY + 45); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
+  drawWrap(ctx, document.getElementById('comment').value || '---', 460, otherY + 75, 290, 20);
 
   document.getElementById('final-image').src = canvas.toDataURL('image/png');
 }
 
 function downloadImage() {
   const link = document.createElement('a');
-  link.download = `Profile_${document.getElementById('name').value.split('\n')[0] || 'th123'}.png`;
-  link.href = document.getElementById('final-image').src;
-  link.click();
+  link.download = `Profile_${document.getElementById('name').value || 'th123'}.png`;
+  link.href = document.getElementById('final-image').src; link.click();
 }
 </script>
 </body>
