@@ -49,11 +49,10 @@
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
-  /* ランダムボタン専用スタイル */
   .random-btn-wide { 
-    grid-column: span 5; 
+    grid-column: span 5 !important; 
     aspect-ratio: auto !important; 
-    height: 50px; 
+    height: 60px !important; 
     margin-top: 5px; 
   }
 
@@ -65,6 +64,9 @@
     color: #fff; cursor: pointer; font-size: 12px; text-align: center;
   }
   .color-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
+
+  /* 通信設定用スタイル */
+  .connection-row { margin-bottom: 8px; font-size: 0.9em; }
 
   .btn-group { display: flex; gap: 10px; margin-top: 20px; }
   #generate-btn { flex: 1; padding: 15px; background: var(--accent-color); font-weight: bold; cursor: pointer; border: none; }
@@ -114,9 +116,15 @@
 
       <div class="form-group">
         <label>通信設定</label>
-        <div style="display: flex; gap: 20px;">
-          <div>ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可</div>
-          <div>クライアント：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可</div>
+        <div class="connection-row">
+          ホスト：
+          <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 
+          <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
+        </div>
+        <div class="connection-row">
+          クライアント：
+          <input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 
+          <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
         </div>
       </div>
 
@@ -159,14 +167,14 @@ const charList = [
   { name: "博麗霊夢", id: "reimu", file: "Select_01Reimu.png" },
   { name: "霧雨魔理沙", id: "marisa", file: "Select_02Marisa.png" },
   { name: "十六夜咲夜", id: "sakuya", file: "Select_03Sakuya.png" },
-  { name: "アリス", id: "alice", file: "Select_04Alice.png" },
-  { name: "パチュリー", id: "patchouli", file: "Select_05Patchouli.png" },
+  { name: "アリス・マーガトロイド", id: "alice", file: "Select_04Alice.png" },
+  { name: "パチュリー・ノーレッジ", id: "patchouli", file: "Select_05Patchouli.png" },
   { name: "魂魄妖夢", id: "youmu", file: "Select_06Youmu.png" },
-  { name: "レミリア", id: "remilia", file: "Select_07Remilia.png" },
+  { name: "レミリア・スカーレット", id: "remilia", file: "Select_07Remilia.png" },
   { name: "西行寺幽々子", id: "yuyuko", file: "Select_08Yuyuko.png" },
   { name: "八雲紫", id: "yukari", file: "Select_09Yukari.png" },
   { name: "伊吹萃香", id: "suika", file: "Select_10Suika.png" },
-  { name: "鈴仙", id: "reisen", file: "Select_11Udonge.png" },
+  { name: "鈴仙・優曇華院・イナバ", id: "reisen", file: "Select_11Udonge.png" },
   { name: "射命丸文", id: "aya", file: "Select_12Aya.png" },
   { name: "小野塚小町", id: "komachi", file: "Select_13Komachi.png" },
   { name: "永江衣玖", id: "iku", file: "Select_14Iku.png" },
@@ -199,11 +207,11 @@ window.onload = () => {
     const sImg = document.createElement('img'); sImg.src = selectPngPath + char.file;
     sb.appendChild(sImg);
     sb.onclick = () => {
-      if(selectedSubs.includes(char.name)){
-        selectedSubs = selectedSubs.filter(n => n !== char.name);
+      if(selectedSubs.some(s => s.id === char.id)){
+        selectedSubs = selectedSubs.filter(s => s.id !== char.id);
         sb.classList.remove('selected');
       } else {
-        selectedSubs.push(char.name);
+        selectedSubs.push(char);
         sb.classList.add('selected');
       }
       updatePreview();
@@ -213,7 +221,7 @@ window.onload = () => {
 
   const rb = document.createElement('div');
   rb.className = 'char-btn random-btn-wide';
-  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:bold; color:var(--accent-color); background:#1a0f0a; border:1px solid var(--border-color);">？ RANDOM ？</div>';
+  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold; color:var(--accent-color); background:#1a0f0a; border:1px solid var(--border-color);">？ RANDOM ？</div>';
   rb.onclick = () => {
     document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     rb.classList.add('selected');
@@ -250,10 +258,8 @@ function loadCharImage() {
   } else {
     colorUI.classList.remove('disabled-ui');
     subUI.classList.remove('disabled-ui');
-    
     const ext = 'jpg';
     const targetSrc = `./image/${selectedMain.id}/${selectedMain.id}-${selectedColor}p.${ext}`;
-    
     if (charImage.src.indexOf(targetSrc.replace('./', '')) === -1) {
         charImage.onload = () => updatePreview();
         charImage.onerror = () => { 
@@ -302,11 +308,17 @@ function updatePreview() {
 
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
   drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
-  drawLbl('MAIN CHARACTER', 55, 305); drawDat(selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
+  
+  // メインキャラをフルネームで表示
+  drawLbl('MAIN CHARACTER', 55, 305); 
+  const mainName = selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`;
+  drawDat(mainName, 55, 335, 'bold 20px serif');
   
   drawLbl('SUB CHARACTERS', 55, 385); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
-  let subY = drawWrap(ctx, selectedSubs.join(', ') || '---', 55, 415, 380, 22);
+  // サブキャラをフルネームで結合
+  const subNames = selectedSubs.map(s => s.name).join(', ') || '---';
+  let subY = drawWrap(ctx, subNames, 55, 415, 380, 22);
   
   let nextY = subY + 40;
   drawLbl('STYLE / TIME', 55, nextY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, nextY + 30, 'bold 18px serif');
