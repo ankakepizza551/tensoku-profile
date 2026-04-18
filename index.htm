@@ -320,21 +320,19 @@ function updatePreview() {
 
   const rightX = 460;
   const rightTop = 90;
-  let currentRightY = 460; // 固定の基準位置
+  let currentRightY = 460; 
 
   if (selectedMain.id === "random") {
-    // ランダムボックスの描画
     ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, 300, 300); 
     ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, 304, 304);
     
-    // 左右・上下中央に配置
     ctx.fillStyle = brass; 
     ctx.font = 'bold 120px serif'; 
     ctx.textAlign = 'center';      
     ctx.textBaseline = 'middle';   
-    ctx.fillText('？', rightX + 150, rightTop + 150); 
+    // 「？」の配置。150(中心)にさらに+25pxすることで画像の位置に合わせました
+    ctx.fillText('？', rightX + 150, rightTop + 150 + 25); 
     
-    // 設定を戻す
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic'; 
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
@@ -343,7 +341,6 @@ function updatePreview() {
     ctx.strokeRect(rightX - 2, rightTop - 2, charImage.width + 4, charImage.height + 4);
   }
   
-  // テキスト位置は固定にすることでレイアウトを安定させる
   drawLbl('MATCHUP (PROS/CONS)', rightX, currentRightY); 
   drawDat(document.getElementById('matchup').value, rightX, currentRightY + 30, 'bold 16px serif');
   
