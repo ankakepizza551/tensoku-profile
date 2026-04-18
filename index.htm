@@ -86,8 +86,8 @@
   <div class="container">
     <form id="profile-form">
       <div class="form-group">
-        <label>プレイヤー名</label>
-        <input type="text" id="name" placeholder="例：無名のプレイヤー" oninput="updatePreview()">
+        <label>プレイヤー名 (改行可)</label>
+        <textarea id="name" rows="2" placeholder="例：無名のプレイヤー" oninput="updatePreview()"></textarea>
       </div>
       <div class="form-group">
         <label>段位 / レート</label>
@@ -136,8 +136,8 @@
         <input type="text" id="device" placeholder="例：F310、キーボード、アケコン等" oninput="updatePreview()">
       </div>
       <div class="form-group">
-        <label>得意キャラ・苦手キャラ</label>
-        <input type="text" id="matchup" placeholder="例：得意：霊夢 / 苦手：早苗" oninput="updatePreview()">
+        <label>得意キャラ・苦手キャラ (改行可)</label>
+        <textarea id="matchup" rows="4" placeholder="例：得意：霊夢 / 苦手：早苗" oninput="updatePreview()"></textarea>
       </div>
       <div class="form-group">
         <label>天則以外の趣味</label>
@@ -272,21 +272,28 @@ function loadCharImage() {
   }
 }
 
+// 改行対応描画関数
 function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
-  let line = '';
+  const lines = text.split('\n'); // 手動改行を維持
   let currentY = y;
-  for (let n = 0; n < text.length; n++) {
-    let testLine = line + text[n];
-    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-      ctx.fillText(line, x, currentY); 
-      line = text[n]; 
-      currentY += lineHeight;
-    } else { 
-      line = testLine; 
+  
+  lines.forEach(l => {
+    let line = '';
+    for (let n = 0; n < l.length; n++) {
+      let testLine = line + l[n];
+      if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+        ctx.fillText(line, x, currentY); 
+        line = l[n]; 
+        currentY += lineHeight;
+      } else { 
+        line = testLine; 
+      }
     }
-  }
-  ctx.fillText(line, x, currentY); 
-  return currentY; // 描き終わった最終行のY座標を返す
+    ctx.fillText(line, x, currentY); 
+    currentY += lineHeight;
+  });
+  
+  return currentY - lineHeight; // 最終描画位置を返す
 }
 
 function updatePreview() {
@@ -306,29 +313,42 @@ function updatePreview() {
   const hS = document.querySelector('input[name="host"]:checked').value;
   const cS = document.querySelector('input[name="client"]:checked').value;
 
+  // タイトル
   ctx.font = 'bold 24px Oswald';
   ctx.lineWidth = 5; ctx.strokeStyle = '#000';
   ctx.strokeText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
   ctx.fillStyle = brass; ctx.fillText('⚙ HISOUTENSOKU PROFILE ⚙', 50, 75);
 
-  drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
-  drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
+  // 左側：基本情報（プレイヤー名改行対応）
+  drawLbl('PLAYER NAME', 55, 130);
+  ctx.fillStyle = '#fdf5e6';
+  ctx.font = 'bold 44px serif';
+  let nameEndY = drawWrap(ctx, name || '無名のプレイヤー', 55, 180, 380, 50);
+
+  let rankY = nameEndY + 45;
+  drawLbl('RANK / RATE', 55, rankY); drawDat(rank, 55, rankY + 30, 'bold 24px serif');
   
-  drawLbl('MAIN CHARACTER', 55, 305); 
+  let mainY = rankY + 75;
+  drawLbl('MAIN CHARACTER', 55, mainY); 
   const mainName = selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`;
-  drawDat(mainName, 55, 335, 'bold 20px serif');
+  drawDat(mainName, 55, mainY + 30, 'bold 20px serif');
   
-  drawLbl('SUB CHARACTERS', 55, 385); 
+  let subLabelY = mainY + 80;
+  drawLbl('SUB CHARACTERS', 55, subLabelY); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   const subNames = selectedSubs.map(s => s.name).join(', ') || '---';
-  let subY = drawWrap(ctx, subNames, 55, 415, 380, 22);
+  let subY = drawWrap(ctx, subNames, 55, subLabelY + 30, 380, 22);
   
-  let nextY = subY + 40;
-  drawLbl('STYLE / TIME', 55, nextY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, nextY + 30, 'bold 18px serif');
-  drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
-  drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
+  let styleY = subY + 45;
+  drawLbl('STYLE / TIME', 55, styleY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, styleY + 30, 'bold 18px serif');
+  
+  let hostY = styleY + 85;
+  drawLbl('HOST / CLIENT', 55, hostY); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, hostY + 115, 'bold 18px serif');
+  
+  let deviceY = hostY + 170;
+  drawLbl('DEVICE', 55, deviceY); drawDat(document.getElementById('device').value, 55, deviceY + 30, 'bold 17px serif');
 
-  // キャラクター表示エリア
+  // キャラクター画像表示
   const charBoxX = 460;
   const charBoxY = 90;
 
@@ -347,21 +367,18 @@ function updatePreview() {
     ctx.strokeRect(charBoxX, charBoxY, w, h);
   }
   
-  // 右側項目の描画（ここから改行対応の修正箇所）
+  // 右側：自由記述項目
   let rightY = 460;
   
-  // 得意キャラ・苦手キャラ
   drawLbl('MATCHUP (PROS/CONS)', 460, rightY); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 16px serif';
   let matchupY = drawWrap(ctx, document.getElementById('matchup').value || '---', 460, rightY + 30, 290, 22);
 
-  // 他の趣味 (matchupY の位置から動的に配置)
   let interestsStartY = matchupY + 45;
   drawLbl('OTHER INTERESTS', 460, interestsStartY); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, interestsStartY + 30, 290, 22);
   
-  // 一言コメント (otherY の位置から動的に配置)
   let commentStartY = otherY + 45;
   drawLbl('COMMENT', 460, commentStartY); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
@@ -372,7 +389,7 @@ function updatePreview() {
 
 function downloadImage() {
   const link = document.createElement('a');
-  link.download = `Profile_${document.getElementById('name').value || 'th123'}.png`;
+  link.download = `Profile_${document.getElementById('name').value.split('\n')[0] || 'th123'}.png`;
   link.href = document.getElementById('final-image').src;
   link.click();
 }
