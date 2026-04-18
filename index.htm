@@ -160,6 +160,7 @@
   </div>
 
 <script>
+// キャラクターリストや初期設定は変更なし
 const selectPngPath = "./image/ProfileSelectPNG/";
 const charList = [
   { name: "博麗霊夢", id: "reimu", file: "Select_01Reimu.png" },
@@ -189,7 +190,6 @@ let charImage = new Image();
 
 window.onload = () => {
   const mS = document.getElementById('main-char-selector'), sS = document.getElementById('sub-char-selector');
-  
   charList.forEach(char => {
     const mb = document.createElement('div'); mb.className = 'char-btn';
     const mImg = document.createElement('img'); mImg.src = selectPngPath + char.file;
@@ -200,7 +200,6 @@ window.onload = () => {
       mb.classList.add('selected'); selectedMain = char; loadCharImage();
     };
     mS.appendChild(mb);
-
     const sb = document.createElement('div'); sb.className = 'char-btn';
     const sImg = document.createElement('img'); sImg.src = selectPngPath + char.file;
     sb.appendChild(sImg);
@@ -216,7 +215,6 @@ window.onload = () => {
     };
     sS.appendChild(sb);
   });
-
   const rb = document.createElement('div');
   rb.className = 'char-btn random-btn-wide';
   rb.innerHTML = '<div class="random-inner">？ RANDOM ？</div>';
@@ -227,7 +225,6 @@ window.onload = () => {
     loadCharImage();
   };
   mS.appendChild(rb);
-
   updateColorSelector();
   loadCharImage();
 };
@@ -285,7 +282,6 @@ function drawWrap(ctx, text, x, y, maxWidth, lineHeight) {
 function updatePreview() {
   const canvas = document.getElementById('card-canvas'), ctx = canvas.getContext('2d'), brass = '#daa520';
   ctx.fillStyle = '#1a0f0a'; ctx.fillRect(0, 0, 800, 800);
-  
   ctx.fillStyle = 'rgba(218, 165, 32, 0.08)';
   for(let i=0; i<800; i+=4) { for(let j=0; j<800; j+=4) { ctx.fillRect(i, j, 1, 1); } }
   ctx.strokeStyle = brass; ctx.lineWidth = 4; ctx.strokeRect(20, 20, 760, 760);
@@ -307,12 +303,10 @@ function updatePreview() {
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
   drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
   drawLbl('MAIN CHARACTER', 55, 305); drawDat(selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
-  
   drawLbl('SUB CHARACTERS', 55, 385); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   const subNames = selectedSubs.map(s => s.name).join(', ') || '---';
   let subY = drawWrap(ctx, subNames, 55, 415, 380, 22);
-  
   let nextY = subY + 40;
   drawLbl('STYLE / TIME', 55, nextY); drawDat(`${style} / ${document.getElementById('time').value}`, 55, nextY + 30, 'bold 18px serif');
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
@@ -330,16 +324,25 @@ function updatePreview() {
     ctx.fillStyle = brass; 
     ctx.font = 'bold 160px serif'; 
     ctx.textAlign = 'center';      
-    ctx.textBaseline = 'middle'; 
+    ctx.textBaseline = 'alphabetic'; 
 
-    // --- 物理的な中央計算 ---
-    // measureTextで文字の正確な高さを取得
+    // --- 最終補正版の中央計算 ---
+    // 1. まず現在のフォントでの「？」の寸法を測る
     const metrics = ctx.measureText('？');
+    // 文字の実際の高さを計算
     const actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
     
-    // ボックスの中心(rightTop + 150)から、フォントの描画のズレを補正して描画
-    const centerY = rightTop + (rightBoxSize / 2) + (metrics.actualBoundingBoxAscent - actualHeight / 2);
-    ctx.fillText('？', rightX + (rightBoxSize / 2), centerY); 
+    // 2. ボックスの中央座標
+    const boxCenterX = rightX + (rightBoxSize / 2);
+    const boxCenterY = rightTop + (rightBoxSize / 2);
+
+    // 3. 描画座標の決定
+    // 文字の「中心」がボックスの「中心」に重なるように、Ascent（上方向の広がり）を利用して調整
+    // Noto Serif JP等、一部のフォントでは描画基準がかなりズレるため、
+    // ボックス中心から「文字の高さの半分」を引き、そこに「上方向の余裕分」を足す計算です。
+    const finalDrawY = boxCenterY + (actualHeight / 2) - metrics.actualBoundingBoxDescent;
+
+    ctx.fillText('？', boxCenterX, finalDrawY); 
     
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic'; 
@@ -351,11 +354,9 @@ function updatePreview() {
   
   drawLbl('MATCHUP (PROS/CONS)', rightX, currentRightY); 
   drawDat(document.getElementById('matchup').value, rightX, currentRightY + 30, 'bold 16px serif');
-  
   drawLbl('OTHER INTERESTS', rightX, currentRightY + 75); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
   let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', rightX, currentRightY + 105, 290, 22);
-  
   drawLbl('COMMENT', rightX, otherY + 40); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
   drawWrap(ctx, document.getElementById('comment').value || '---', rightX, otherY + 70, 290, 20);
