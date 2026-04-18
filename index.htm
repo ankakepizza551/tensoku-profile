@@ -49,11 +49,26 @@
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
+  /* ランダムボタンのレイアウト崩れ防止 */
   .random-btn-wide { 
     grid-column: span 5 !important; 
     aspect-ratio: auto !important; 
-    height: 60px !important; 
+    height: auto !important; 
+    min-height: 50px;
     margin-top: 5px; 
+  }
+  .random-inner {
+    width: 100%; 
+    height: 100%; 
+    padding: 10px 0;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 18px; 
+    font-weight: bold; 
+    color: var(--accent-color); 
+    background: #1a0f0a; 
+    border: 1px solid var(--border-color);
   }
 
   .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
@@ -64,9 +79,6 @@
     color: #fff; cursor: pointer; font-size: 12px; text-align: center;
   }
   .color-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
-
-  /* 通信設定用スタイル */
-  .connection-row { margin-bottom: 8px; font-size: 0.9em; }
 
   .btn-group { display: flex; gap: 10px; margin-top: 20px; }
   #generate-btn { flex: 1; padding: 15px; background: var(--accent-color); font-weight: bold; cursor: pointer; border: none; }
@@ -116,15 +128,9 @@
 
       <div class="form-group">
         <label>通信設定</label>
-        <div class="connection-row">
-          ホスト：
-          <input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 
-          <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可
-        </div>
-        <div class="connection-row">
-          クライアント：
-          <input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 
-          <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可
+        <div style="display: flex; gap: 20px;">
+          <div>ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可</div>
+          <div>クライアント：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可</div>
         </div>
       </div>
 
@@ -221,7 +227,7 @@ window.onload = () => {
 
   const rb = document.createElement('div');
   rb.className = 'char-btn random-btn-wide';
-  rb.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold; color:var(--accent-color); background:#1a0f0a; border:1px solid var(--border-color);">？ RANDOM ？</div>';
+  rb.innerHTML = '<div class="random-inner">？ RANDOM ？</div>';
   rb.onclick = () => {
     document.querySelectorAll('#main-char-selector .char-btn').forEach(e => e.classList.remove('selected'));
     rb.classList.add('selected');
@@ -308,15 +314,10 @@ function updatePreview() {
 
   drawLbl('PLAYER NAME', 55, 130); drawDat(name, 55, 185, 'bold 44px serif');
   drawLbl('RANK / RATE', 55, 230); drawDat(rank, 55, 260, 'bold 24px serif');
-  
-  // メインキャラをフルネームで表示
-  drawLbl('MAIN CHARACTER', 55, 305); 
-  const mainName = selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`;
-  drawDat(mainName, 55, 335, 'bold 20px serif');
+  drawLbl('MAIN CHARACTER', 55, 305); drawDat(selectedMain.id === "random" ? "ランダム" : `${selectedMain.name} (${selectedColor}P)`, 55, 335, 'bold 20px serif');
   
   drawLbl('SUB CHARACTERS', 55, 385); 
   ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
-  // サブキャラをフルネームで結合
   const subNames = selectedSubs.map(s => s.name).join(', ') || '---';
   let subY = drawWrap(ctx, subNames, 55, 415, 380, 22);
   
@@ -325,23 +326,41 @@ function updatePreview() {
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
+  // 右側の描画エリアの設定
+  const rightX = 460;
+  const rightTop = 90;
+  let currentRightY = rightTop;
+
   if (selectedMain.id === "random") {
-    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(460, 90, 300, 400); 
-    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(458, 88, 304, 404);
+    // ランダムの場合は？ボックスを表示
+    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, 300, 400); 
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, 304, 404);
     ctx.fillStyle = brass; ctx.font = 'bold 150px serif'; ctx.textAlign = 'center';
-    ctx.fillText('？', 460 + 150, 90 + 260); ctx.textAlign = 'left';
+    ctx.fillText('？', rightX + 150, rightTop + 260); ctx.textAlign = 'left';
+    currentRightY = rightTop + 400; // テキスト開始位置をボックスの下に設定
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
-    ctx.drawImage(charImage, 460, 90);
+    // 通常キャラの場合は画像を表示
+    ctx.drawImage(charImage, rightX, rightTop);
     ctx.strokeStyle = brass; ctx.lineWidth = 2;
-    ctx.strokeRect(458, 88, charImage.width + 4, charImage.height + 4);
+    ctx.strokeRect(rightX - 2, rightTop - 2, charImage.width + 4, charImage.height + 4);
+    currentRightY = rightTop + charImage.height; // 画像の下に設定
+  } else {
+    currentRightY = 460; // 予備
   }
   
-  let rightY = 460;
-  drawLbl('MATCHUP (PROS/CONS)', 460, rightY); drawDat(document.getElementById('matchup').value, 460, rightY + 30, 'bold 16px serif');
-  drawLbl('OTHER INTERESTS', 460, rightY + 75); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
-  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', 460, rightY + 105, 290, 22);
-  drawLbl('COMMENT', 460, otherY + 40); ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
-  drawWrap(ctx, document.getElementById('comment').value || '---', 460, otherY + 70, 290, 20);
+  // テキスト項目の開始位置を少し下にずらす
+  currentRightY += 40;
+
+  drawLbl('MATCHUP (PROS/CONS)', rightX, currentRightY); 
+  drawDat(document.getElementById('matchup').value, rightX, currentRightY + 30, 'bold 16px serif');
+  
+  drawLbl('OTHER INTERESTS', rightX, currentRightY + 75); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 15px serif';
+  let otherY = drawWrap(ctx, document.getElementById('other-games').value || '---', rightX, currentRightY + 105, 290, 22);
+  
+  drawLbl('COMMENT', rightX, otherY + 40); 
+  ctx.fillStyle = '#fdf5e6'; ctx.font = 'bold 14px serif';
+  drawWrap(ctx, document.getElementById('comment').value || '---', rightX, otherY + 70, 290, 20);
 
   document.getElementById('final-image').src = canvas.toDataURL('image/png');
 }
