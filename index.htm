@@ -320,24 +320,29 @@ function updatePreview() {
 
   const rightX = 460;
   const rightTop = 90;
+  const rightBoxSize = 300; 
   let currentRightY = 460; 
 
   if (selectedMain.id === "random") {
-    // ボックス描画
-    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, 300, 300); 
-    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, 304, 304);
+    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, rightBoxSize, rightBoxSize); 
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, rightBoxSize + 4, rightBoxSize + 4);
     
-    // 文字の描画設定
     ctx.fillStyle = brass; 
-    ctx.font = 'bold 140px serif'; 
+    ctx.font = 'bold 160px serif'; 
     ctx.textAlign = 'center';      
-    ctx.textBaseline = 'alphabetic'; // ブラウザのクセが出にくい標準設定に戻す
+    ctx.textBaseline = 'middle'; 
+
+    // --- 物理的な中央計算 ---
+    // measureTextで文字の正確な高さを取得
+    const metrics = ctx.measureText('？');
+    const actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
     
-    // Y座標計算: rightTop(90) + ボックス中央(150) + フォント高さの微調整(約50px)
-    ctx.fillText('？', rightX + 150, rightTop + 205); 
+    // ボックスの中心(rightTop + 150)から、フォントの描画のズレを補正して描画
+    const centerY = rightTop + (rightBoxSize / 2) + (metrics.actualBoundingBoxAscent - actualHeight / 2);
+    ctx.fillText('？', rightX + (rightBoxSize / 2), centerY); 
     
-    // 設定をリセット
     ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic'; 
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
     ctx.drawImage(charImage, rightX, rightTop);
     ctx.strokeStyle = brass; ctx.lineWidth = 2;
