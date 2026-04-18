@@ -49,7 +49,6 @@
   .char-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .char-btn.selected { border: 3px solid var(--accent-color); box-shadow: 0 0 12px var(--accent-color); }
 
-  /* ランダムボタンのレイアウト崩れ防止 */
   .random-btn-wide { 
     grid-column: span 5 !important; 
     aspect-ratio: auto !important; 
@@ -58,17 +57,10 @@
     margin-top: 5px; 
   }
   .random-inner {
-    width: 100%; 
-    height: 100%; 
-    padding: 10px 0;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 18px; 
-    font-weight: bold; 
-    color: var(--accent-color); 
-    background: #1a0f0a; 
-    border: 1px solid var(--border-color);
+    width: 100%; height: 100%; padding: 12px 0;
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 18px; font-weight: bold; color: var(--accent-color); 
+    background: #1a0f0a; border: 1px solid var(--border-color);
   }
 
   .disabled-ui { pointer-events: none; opacity: 0.4; filter: grayscale(1); }
@@ -128,7 +120,7 @@
 
       <div class="form-group">
         <label>通信設定</label>
-        <div style="display: flex; gap: 20px;">
+        <div style="display: flex; gap: 20px; font-size: 0.9em;">
           <div>ホスト：<input type="radio" name="host" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="host" value="不可" onchange="updatePreview()"> 不可</div>
           <div>クライアント：<input type="radio" name="client" value="可" checked onchange="updatePreview()"> 可 <input type="radio" name="client" value="不可" onchange="updatePreview()"> 不可</div>
         </div>
@@ -326,31 +318,23 @@ function updatePreview() {
   drawLbl('HOST / CLIENT', 55, nextY + 85); drawDat(`ホスト: ${hS} / クライアント: ${cS}`, 55, nextY + 115, 'bold 18px serif');
   drawLbl('DEVICE', 55, nextY + 170); drawDat(document.getElementById('device').value, 55, nextY + 200, 'bold 17px serif');
 
-  // 右側の描画エリアの設定
   const rightX = 460;
   const rightTop = 90;
-  let currentRightY = rightTop;
+  let currentRightY = 460; // 固定の基準位置
 
   if (selectedMain.id === "random") {
-    // ランダムの場合は？ボックスを表示
-    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, 300, 400); 
-    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, 304, 404);
-    ctx.fillStyle = brass; ctx.font = 'bold 150px serif'; ctx.textAlign = 'center';
-    ctx.fillText('？', rightX + 150, rightTop + 260); ctx.textAlign = 'left';
-    currentRightY = rightTop + 400; // テキスト開始位置をボックスの下に設定
+    // ランダムボックスのサイズを300pxに縮小
+    ctx.fillStyle = '#1a0f0a'; ctx.fillRect(rightX, rightTop, 300, 300); 
+    ctx.strokeStyle = brass; ctx.lineWidth = 2; ctx.strokeRect(rightX - 2, rightTop - 2, 304, 304);
+    ctx.fillStyle = brass; ctx.font = 'bold 120px serif'; ctx.textAlign = 'center';
+    ctx.fillText('？', rightX + 150, rightTop + 200); ctx.textAlign = 'left';
   } else if(charImage.complete && charImage.naturalWidth !== 0) {
-    // 通常キャラの場合は画像を表示
     ctx.drawImage(charImage, rightX, rightTop);
     ctx.strokeStyle = brass; ctx.lineWidth = 2;
     ctx.strokeRect(rightX - 2, rightTop - 2, charImage.width + 4, charImage.height + 4);
-    currentRightY = rightTop + charImage.height; // 画像の下に設定
-  } else {
-    currentRightY = 460; // 予備
   }
   
-  // テキスト項目の開始位置を少し下にずらす
-  currentRightY += 40;
-
+  // テキスト位置は固定にすることでレイアウトを安定させる
   drawLbl('MATCHUP (PROS/CONS)', rightX, currentRightY); 
   drawDat(document.getElementById('matchup').value, rightX, currentRightY + 30, 'bold 16px serif');
   
